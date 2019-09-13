@@ -1,5 +1,7 @@
 package org.example.u.noticedemo;
 
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -39,15 +41,16 @@ class NetworkSupport {
 		return feedback.toString();
 	}
 
-	String doLogin(String user, String password) throws IOException {
+	JSONObject[] doLogin(String user, String password) throws IOException {
 		HashMap<String, String> params = new HashMap<>();
 		params.put("user", user);
 		params.put("password", password);
-		return this.postData(params);
+		return JSONParser.networkJsonDecode(this.postData(params));
 	}
 
 	private String postData(HashMap<String, String> params) throws IOException {
 		String response = "";
+		StringBuilder stringBuilder = new StringBuilder();
 		URL url = new URL(server_address);
 		HttpsURLConnection client = null;
 		try {
@@ -76,11 +79,13 @@ class NetworkSupport {
 						new InputStreamReader(client.getInputStream())
 				);
 				while ((line = bufferedReader.readLine()) != null){
-					response += line;
+					stringBuilder.append(line);
+					//response += line;
 				}
+				response = stringBuilder.toString();
 			}
 			else {
-				response = "";
+				response = "{}";
 			}
 		}
 		catch (IOException e){

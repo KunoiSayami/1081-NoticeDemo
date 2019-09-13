@@ -1,0 +1,9 @@
+{
+  "server_address": "https://example.com/",
+  "pages": {
+    "login": "login",
+    "token": "token",
+    "do": "update",
+    "refresh": "refresh"
+  }
+}

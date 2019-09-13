@@ -7,6 +7,7 @@ import androidx.core.app.NotificationManagerCompat;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.net.Network;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,18 +18,46 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.HashMap;
+
 public class MainActivity extends AppCompatActivity {
 
 	String CHANNEL_ID = "NoticeDemo";
 
-	String TAG = "MainActivity";
+	String TAG = "NoticeDemoMain";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		this.sendNotice();
+		this.loadConfig();
 		this.init();
+	}
+
+	void loadConfig() {
+		//https://stackoverflow.com/a/45908819
+		JSONObject[] jsonObjects = JSONParser.getJson(
+			JSONParser.loadJSONFromAsset(getApplicationContext().getResources().openRawResource(R.raw.config))
+		);
+		if (jsonObjects != null) {
+			try {
+				NetworkSupport.server_address = jsonObjects[0].get(getString(R.string.server_address_field)).toString();
+				NetworkSupport.login_path = jsonObjects[1].get(getString(R.string.login_field)).toString();
+				NetworkSupport.token_path = jsonObjects[1].get(getString(R.string.token_field)).toString();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+			Toast.makeText(MainActivity.this, "loadConfig error!", Toast.LENGTH_LONG).show();
+			Log.e(TAG, "loadConfig: jsonObjects can't be null");
+			//https://support.crashlytics.com/knowledgebase/articles/112848-how-do-i-force-a-crash-using-the-android-sdk
+			throw new RuntimeException("Read config error");
+		}
 	}
 
 	void init(){

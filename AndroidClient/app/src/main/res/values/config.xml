@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="server_address">https://example.org/</string>
-    <string name="login_page">login</string>
-    <string name="token_update">token</string>
-</resources>

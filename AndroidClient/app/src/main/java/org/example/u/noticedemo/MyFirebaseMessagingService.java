@@ -1,8 +1,5 @@
 package org.example.u.noticedemo;
 
-import android.app.Service;
-import android.content.Intent;
-import android.os.IBinder;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
@@ -13,7 +10,7 @@ import com.google.firebase.messaging.RemoteMessage;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
-	String TAG = "MyFirebaseMessagingService";
+	String TAG = "log_MyFirebaseMessagingService";
 
 	@Override
 	public void onMessageReceived(RemoteMessage remoteMessage) {

@@ -1,21 +1,16 @@
 package org.example.u.noticedemo;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.net.Network;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import androidx.appcompat.app.AppCompatActivity;
 
-import java.io.IOException;
-
-class NetworkLoginException extends Exception {
+	class NetworkLoginException extends Exception {
 
 }
 
@@ -23,6 +18,7 @@ public class LoginActivity extends AppCompatActivity {
 
 	EditText etUser, etPassword;
 	Button btLogin;
+	CheckBox cbRemember;
 
 	String TAG = "log_LoginActivity";
 
@@ -37,6 +33,15 @@ public class LoginActivity extends AppCompatActivity {
 		etUser = findViewById(R.id.etUser);
 		etPassword = findViewById(R.id.etPassword);
 		btLogin = findViewById(R.id.btLogin);
+		cbRemember = findViewById(R.id.cbRemember);
+
+		cbRemember.setChecked(MainActivity.databaseHelper.isRememberedPassword());
+
+		if (cbRemember.isChecked()) {
+			String[] accountGroup = MainActivity.databaseHelper.getStoredUser();
+			etUser.setText(accountGroup[0]);
+			etPassword.setText(accountGroup[1]);
+		}
 
 		btLogin.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -55,10 +60,14 @@ public class LoginActivity extends AppCompatActivity {
 					Log.d(TAG, "onClick: Status => " + httpRawResponse.getStatus());
 					if (httpRawResponse.getStatus() == 200) {
 						Toast.makeText(LoginActivity.this, "Login success", Toast.LENGTH_SHORT).show();
+						if (cbRemember.isChecked()){
+							MainActivity.databaseHelper.updateUser(strUser, strPassword);
+						}
 					}
 					else {
 						throw new NetworkLoginException();
 					}
+					MainActivity.databaseHelper.setRememberedPassword(cbRemember.isChecked());
 				} catch (Exception e) {
 					e.printStackTrace();
 					Toast.makeText(LoginActivity.this,"Login error", Toast.LENGTH_SHORT).show();

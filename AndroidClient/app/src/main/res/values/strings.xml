@@ -17,5 +17,6 @@
     <string name="text_user">User</string>
     <string name="text_password">Password</string>
     <string name="text_title_login_page">Login page</string>
+    <string name="text_remember_password">Remember me</string>
     <!-- login page end -->
 </resources>

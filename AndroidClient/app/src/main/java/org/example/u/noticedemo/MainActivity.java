@@ -1,36 +1,26 @@
 package org.example.u.noticedemo;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.content.Intent;
-import android.net.Network;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
+import android.widget.CheckBox;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
-import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.IOException;
-import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
-	String CHANNEL_ID = "NoticeDemo";
-
-	String TAG = "NoticeDemoMain";
+	String TAG = "log_Main";
+	static DatabaseHelper databaseHelper;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	void init(){
+		MainActivity.databaseHelper = new DatabaseHelper(this);
 		FirebaseInstanceId.getInstance().getInstanceId()
 				.addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
 					@Override
@@ -93,4 +84,12 @@ public class MainActivity extends AppCompatActivity {
 
 	}
 
+
+	@Override
+	protected void onDestroy() {
+		//CheckBox cbRemember = findViewById(R.id.cbRemember);
+		//MainActivity.databaseHelper.setRememberedPassword(cbRemember.isChecked());
+		MainActivity.databaseHelper.close();
+		super.onDestroy();
+	}
 }

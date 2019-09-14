@@ -10,18 +10,19 @@
         android:id="@+id/btLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="144dp"
+        android:layout_marginTop="36dp"
         android:text="@string/text_login"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/cbRemember" />
 
     <TextView
         android:id="@+id/textUser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
-        android:layout_marginTop="92dp"
+        android:layout_marginTop="80dp"
         android:text="@string/text_user"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textLogin" />
@@ -43,10 +44,10 @@
         android:layout_marginEnd="60dp"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="Name"
         app:layout_constraintBottom_toBottomOf="@+id/textUser"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/textUser" />
+        app:layout_constraintTop_toTopOf="@+id/textUser"
+        app:layout_constraintVertical_bias="0.423" />
 
     <EditText
         android:id="@+id/etPassword"
@@ -66,7 +67,19 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="124dp"
         android:text="@string/text_title_login_page"
+        android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <CheckBox
+        android:id="@+id/cbRemember"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="44dp"
+        android:checked="true"
+        android:text="@string/text_remember_password"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textPassword" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,9 +7,11 @@ import androidx.core.app.NotificationManagerCompat;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Intent;
 import android.net.Network;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -34,9 +36,18 @@ public class MainActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		this.sendNotice();
+
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+		StrictMode.setThreadPolicy(policy);
+
 		this.loadConfig();
 		this.init();
+		this.change_activity();
+	}
+
+	void change_activity() {
+		Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+		startActivity(intent);
 	}
 
 	void loadConfig() {
@@ -80,17 +91,6 @@ public class MainActivity extends AppCompatActivity {
 					}
 				});
 
-	}
-
-	void sendNotice(){
-		NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-				.setSmallIcon(R.drawable.common_full_open_on_phone)
-				.setContentTitle("Test")
-				.setContentText("test demo")
-				.setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-		NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
-		notificationManagerCompat.notify(1, builder.build());
 	}
 
 }

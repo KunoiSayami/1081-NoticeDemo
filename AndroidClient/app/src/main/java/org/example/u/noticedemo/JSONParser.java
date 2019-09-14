@@ -8,8 +8,9 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 
+
 public class JSONParser {
-	static String TAG = "NoticeDemoJSONParser";
+	static String TAG = "log_JSONParser";
 
 	/* Reference material:
 	https://blog.csdn.net/bzlj2912009596/article/details/79223818
@@ -49,17 +50,19 @@ public class JSONParser {
 		return null;
 	}
 
-	static public JSONObject[] networkJsonDecode(String json_text) {
+	static String tob(boolean b){
+		return b? "True" : "False";
+	}
+
+	static public HttpRawResponse networkJsonDecode(String json_text) {
 		//Structure:
 		// RAW | STATUS | OPTIONS | ERRORS
-		JSONObject[] jsonObjects = new JSONObject[3];
+		HttpRawResponse httpRawResponse;
+		Log.d(TAG, "networkJsonDecode: json_text => "+ json_text);
 		try{
 			JSONObject obj = new JSONObject(json_text);
-			jsonObjects[0] = obj;
-			jsonObjects[1] = obj.getJSONObject("status");
-			jsonObjects[2] = obj.getJSONObject("options");
-			jsonObjects[3] = obj.getJSONObject("errors");
-			return jsonObjects;
+			httpRawResponse = new HttpRawResponse(obj);
+			return httpRawResponse;
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

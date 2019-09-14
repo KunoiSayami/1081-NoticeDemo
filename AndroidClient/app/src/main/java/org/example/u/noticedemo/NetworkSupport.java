@@ -1,5 +1,8 @@
 package org.example.u.noticedemo;
 
+import android.os.StrictMode;
+import android.util.Log;
+
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -24,6 +27,9 @@ class NetworkSupport {
 	static String login_path = "";
 	static String token_path = "";
 
+
+	static String TAG = "NoticeDemoNetworkSupport";
+
 	private String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
 		StringBuilder feedback = new StringBuilder();
 		boolean first = true;
@@ -41,15 +47,18 @@ class NetworkSupport {
 		return feedback.toString();
 	}
 
-	JSONObject[] doLogin(String user, String password) throws IOException {
+	public HttpRawResponse doLogin(String user, String password) throws IOException {
 		HashMap<String, String> params = new HashMap<>();
 		params.put("user", user);
 		params.put("password", password);
-		return JSONParser.networkJsonDecode(this.postData(params));
+		String req = this.postData(params);
+		Log.d(TAG, "doLogin: => " + req);
+		return JSONParser.networkJsonDecode(req);
 	}
 
 	private String postData(HashMap<String, String> params) throws IOException {
 		String response = "";
+		String strParams = new JSONObject(params).toString();
 		StringBuilder stringBuilder = new StringBuilder();
 		URL url = new URL(server_address);
 		HttpsURLConnection client = null;
@@ -57,7 +66,7 @@ class NetworkSupport {
 			client = (HttpsURLConnection) url.openConnection();
 			client.setRequestMethod("POST");
 			client.setRequestProperty("Accept-Charset", "utf8");
-			client.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=utf8");
+			client.setRequestProperty("Content-Type", "application/json");
 
 			client.setDoInput(true);
 			client.setDoOutput(true);
@@ -66,7 +75,7 @@ class NetworkSupport {
 			BufferedWriter bufferedWriter = new BufferedWriter(
 					new OutputStreamWriter(os, StandardCharsets.UTF_8)
 			);
-			bufferedWriter.write(getPostDataString(params));
+			bufferedWriter.write(strParams);
 
 			bufferedWriter.flush();
 			bufferedWriter.close();
@@ -79,10 +88,13 @@ class NetworkSupport {
 						new InputStreamReader(client.getInputStream())
 				);
 				while ((line = bufferedReader.readLine()) != null){
+					Log.d(TAG, "postData: line => " + line);
 					stringBuilder.append(line);
 					//response += line;
 				}
 				response = stringBuilder.toString();
+				//response = response.substring(1, response.length() - 1);
+				bufferedReader.close();
 			}
 			else {
 				response = "{}";

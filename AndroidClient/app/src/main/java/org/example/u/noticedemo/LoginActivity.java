@@ -1,0 +1,69 @@
+package org.example.u.noticedemo;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.net.Network;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+
+class NetworkLoginException extends Exception {
+
+}
+
+public class LoginActivity extends AppCompatActivity {
+
+	EditText etUser, etPassword;
+	Button btLogin;
+
+	String TAG = "log_LoginActivity";
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_login);
+		this.init();
+	}
+
+	void init() {
+		etUser = findViewById(R.id.etUser);
+		etPassword = findViewById(R.id.etPassword);
+		btLogin = findViewById(R.id.btLogin);
+
+		btLogin.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				NetworkSupport networkSupport = new NetworkSupport();
+				String strUser = etUser.getText().toString();
+				String strPassword = etPassword.getText().toString();
+
+				if (strPassword.length() == 0) {
+					strUser = "test";
+					strPassword = "test";
+				}
+				HttpRawResponse httpRawResponse;
+				try {
+					httpRawResponse = networkSupport.doLogin(strUser, strPassword);
+					Log.d(TAG, "onClick: Status => " + httpRawResponse.getStatus());
+					if (httpRawResponse.getStatus() == 200) {
+						Toast.makeText(LoginActivity.this, "Login success", Toast.LENGTH_SHORT).show();
+					}
+					else {
+						throw new NetworkLoginException();
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					Toast.makeText(LoginActivity.this,"Login error", Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
+	}
+}

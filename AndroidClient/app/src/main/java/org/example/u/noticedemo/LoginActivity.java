@@ -50,10 +50,12 @@ public class LoginActivity extends AppCompatActivity {
 				String strUser = etUser.getText().toString();
 				String strPassword = etPassword.getText().toString();
 
+				// DEBUG CODE
 				if (strPassword.length() == 0) {
 					strUser = "test";
 					strPassword = "test";
 				}
+
 				HttpRawResponse httpRawResponse;
 				try {
 					httpRawResponse = networkSupport.doLogin(strUser, strPassword);

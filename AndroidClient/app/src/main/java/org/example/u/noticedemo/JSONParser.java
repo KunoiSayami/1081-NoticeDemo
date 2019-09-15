@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 
 public class JSONParser {
@@ -27,7 +28,7 @@ public class JSONParser {
 			byte[] buffer = new byte[size];
 			is.read(buffer);
 			is.close();
-			json = new String(buffer, "UTF-8");
+			json = new String(buffer, StandardCharsets.UTF_8);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 			return null;
@@ -49,10 +50,7 @@ public class JSONParser {
 		}
 		return null;
 	}
-
-	static String tob(boolean b){
-		return b? "True" : "False";
-	}
+	
 
 	static public HttpRawResponse networkJsonDecode(String json_text) {
 		//Structure:

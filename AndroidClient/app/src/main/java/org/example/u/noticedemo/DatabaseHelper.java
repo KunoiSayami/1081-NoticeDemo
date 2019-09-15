@@ -1,6 +1,5 @@
 package org.example.u.noticedemo;
 
-import android.accounts.Account;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -10,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 	Context context;
 	private static final int DATABASE_VERSION = 1;
-	private static String DATABASE_NAME = "n0t1ce.db";
+	private static String DATABASE_NAME = "n0t1c3.db";
 	private static String TABLE_ACCOUNT = "Account";
 	private static String TABLE_OPTION = "Option";
 	private static String CREATE_ACCOUNT = "CREATE TABLE `Account` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `user` TEXT, `password` TEXT)";
@@ -32,7 +31,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL(CREATE_ACCOUNT);
 		db.execSQL(CREATE_OPTION);
-		db.execSQL("INSERT INTO `Option` (`remember_password`) VALUES (1)");
+		db.execSQL("INSERT INTO `Option` (`remember_password`) VALUES (0)");
 		//init();
 	}
 

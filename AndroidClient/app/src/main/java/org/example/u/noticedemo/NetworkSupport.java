@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -26,20 +27,23 @@ class NetworkSupport {
 
 	static String TAG = "log_NetworkSupport";
 
-	public HttpRawResponse doLogin(String user, String password) throws IOException {
+	HttpRawResponse doLogin(String user, String password)
+			throws IOException, NoSuchAlgorithmException {
 		HashMap<String, String> params = new HashMap<>();
 		params.put("user", user);
-		params.put("password", password);
-		String req = this.postData(params);
+		params.put("password", SHA512Support.getHashedPassword(password));
+		String req = this.postData(login_path, params);
 		Log.d(TAG, "doLogin: => " + req);
 		return JSONParser.networkJsonDecode(req);
 	}
 
-	private String postData(HashMap<String, String> params) throws IOException {
+	private
+	String postData(String path, HashMap<String, String> params)
+			throws IOException {
 		String response = "";
 		String strParams = new JSONObject(params).toString();
 		StringBuilder stringBuilder = new StringBuilder();
-		URL url = new URL(server_address);
+		URL url = new URL(server_address + path);
 		HttpsURLConnection client = null;
 		try {
 			client = (HttpsURLConnection) url.openConnection();

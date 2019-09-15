@@ -2,6 +2,7 @@
   "server_address": "https://example.com/",
   "pages": {
     "login": "login",
+    "register": "register",
     "token": "token",
     "do": "update",
     "refresh": "refresh"

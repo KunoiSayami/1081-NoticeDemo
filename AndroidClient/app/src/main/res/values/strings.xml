@@ -9,6 +9,7 @@
     <string name="token_field">token</string>
     <string name="do_field">token</string>
     <string name="refresh_field">refresh</string>
+    <string name="register_field">register</string>
     <!-- Json field name end -->
 
 
@@ -18,5 +19,11 @@
     <string name="text_password">Password</string>
     <string name="text_title_login_page">Login page</string>
     <string name="text_remember_password">Remember me</string>
+    <string name="text_register">Register</string>
     <!-- login page end -->
+
+    <!-- register page -->
+    <string name="text_title_register_page">Register Page</string>
+    <!-- register page end -->
+
 </resources>

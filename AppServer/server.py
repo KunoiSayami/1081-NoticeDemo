@@ -1,3 +1,22 @@
+# -*- coding: utf-8 -*-
+# server.py
+# Copyright (C) 2019 KunoiSayami
+#
+# This module is part of 1081-NiceDemo and is released under
+# the AGPL v3 License: https://www.gnu.org/licenses/agpl-3.0.txt
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
 import time
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -28,7 +47,7 @@ class Server(BaseHTTPRequestHandler):
 		self._set_headers()
 		self.wfile.write(build_status_json(200, [], 0))
 
-	def getJsonObject(self, *args, **kwargs):
+	def getJsonObject(self, input_json: dict):
 		return 200, [], {'code': 0, 'info': ''}
 
 	# POST echoes the message adding a JSON field
@@ -43,12 +62,11 @@ class Server(BaseHTTPRequestHandler):
 
 		# read the message and convert it into a python dictionary
 		length = int(self.headers.get('content-length'))
-		message = json.loads(self.rfile.read(length))
+		input_json = json.loads(self.rfile.read(length))
 
 		# add a property to the object, just to mess with data
-		message['received'] = 'ok'
 
-		status, options, errors = self.getJsonObject()
+		status, options, errors = self.getJsonObject(input_json)
 
 		# send the message back
 		self._set_headers()

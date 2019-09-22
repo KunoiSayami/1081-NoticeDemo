@@ -24,6 +24,7 @@
 
     <!-- register page -->
     <string name="text_title_register_page">Register Page</string>
+    <string name="text_repeat_password">Repeat password</string>
     <!-- register page end -->
 
 </resources>

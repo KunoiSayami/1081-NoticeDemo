@@ -82,7 +82,7 @@ public class LoginActivity extends AppCompatActivity {
 					httpRawResponse = networkSupport.doLogin(strUser, strPassword);
 					Log.d(TAG, "onClick: Status => " + httpRawResponse.getStatus());
 					if (httpRawResponse.getStatus() == 200) {
-						Toast.makeText(LoginActivity.this, "Login success" + SHA512Support.getHashedPassword(strPassword), Toast.LENGTH_SHORT).show();
+						Toast.makeText(LoginActivity.this, "Login success", Toast.LENGTH_SHORT).show();
 						if (cbRemember.isChecked()){
 							MainActivity.databaseHelper.updateUser(strUser, strPassword);
 						}

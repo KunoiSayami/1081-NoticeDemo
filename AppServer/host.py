@@ -43,6 +43,8 @@ class Server(_exServer):
                     self.log_login_attmept(input_json['user'], True)
                     return generate_dict.SUCCESS_LOGIN()
         elif self.path == '/register':
+            if len(input_json['user']) > 16:
+                return generate_dict.ERROR_USERNAME_TOO_LONG()
             sqlObj = Server.conn.query1("SELECT * FROM `accounts` WHERE `username` = %s", input_json['user'])
             if sqlObj is None:
                 Server.conn.execute("INSERT INTO `accounts` (`username`, `password`) VALUE (%s, %s)",

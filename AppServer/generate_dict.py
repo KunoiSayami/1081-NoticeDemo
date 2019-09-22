@@ -12,3 +12,6 @@ def ERROR_INVALID_PASSWORD_OR_USER():
 
 def ERROR_USERNAME_ALREADY_EXIST():
     return (400, [], generate_error_dict(2, 'Username already exist'))
+
+def ERROR_USERNAME_TOO_LONG():
+    return (400, [], generate_error_dict(3, 'User name should be shorter then 16'))

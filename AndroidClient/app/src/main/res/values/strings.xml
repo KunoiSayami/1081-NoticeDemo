@@ -23,6 +23,7 @@
     <!-- login page end -->
 
     <!-- register page -->
+    <string name="text_title_register_page">Register page</string>
     <string name="text_repeat_password">Repeat password</string>
     <!-- register page end -->
 

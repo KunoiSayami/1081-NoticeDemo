@@ -19,6 +19,9 @@
 */
 package org.example.u.noticedemo;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -29,63 +32,70 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
 import javax.net.ssl.HttpsURLConnection;
 
 //https://stackoverflow.com/a/43146379
-class NetworkSupport {
+class NetworkSupport extends AsyncTask<URL, Integer, Long> {
 
 	static String server_address = "";
 	static String login_path = "";
 	static String token_path = "";
 	static String register_path = "";
 
-	static String TAG = "log_NetworkSupport";
+	private static String TAG = "log_NetworkSupport";
 
-	HttpRawResponse doUserAction(String user, String password, int actionType)
-			throws IOException, NoSuchAlgorithmException {
-		HashMap<String, String> params = new HashMap<>();
-		params.put("user", user);
-		params.put("password", SHA512Support.getHashedPassword(password));
-		String path;
-		switch (actionType) {
-			case 0:
-				path = login_path;
-				break;
+	String response = "";
+
+	private NetworkRequestType networkRequestType;
+	private String requestPath;
+	@SuppressLint("StaticFieldLeak")
+	private Context myContext;
+	HashMap<String, String> postParams;
+	Object obj;
+
+
+	NetworkSupport(Context context, String _reversed, NetworkRequestType _networkRequestType) {
+		myContext = context;
+		//GoesAddress = gowhere;
+		networkRequestType = _networkRequestType;
+		chooseType();
+	}
+
+	void chooseType(){
+		switch (this.networkRequestType.getType()) {
 			case 1:
-				path = register_path;
+				//postParams.put("user", networkRequestType.getParams().get("user"));
+				postParams = networkRequestType.getParams();
+
+				// Check is login or register
+				switch (this.networkRequestType.getSubType()) {
+					case 0:
+						requestPath = login_path;
+						break;
+					case 1:
+						requestPath = register_path;
+						break;
+					default:
+						throw new RuntimeException("Path has not default value");
+				}
 				break;
+
 			default:
-				throw new RuntimeException("Path has not default value");
+				throw new RuntimeException();
 		}
-		String req = this.postData(path, params);
-		Log.d(TAG, "doLogin: => " + req);
-		return JSONParser.networkJsonDecode(req);
-	}
-
-	public
-	HttpRawResponse doRegister(String user, String password)
-		throws IOException, NoSuchAlgorithmException {
-		return doUserAction(user, password, 1);
-	}
-
-	public
-	HttpRawResponse doLogin(String user, String password)
-			throws IOException, NoSuchAlgorithmException {
-		return doUserAction(user, password, 0);
 	}
 
 	private
-	String postData(String path, HashMap<String, String> params)
-			throws IOException {
-		String response = "";
-		String strParams = new JSONObject(params).toString();
+	void postData() throws IOException {
+		//String response = "";
+		String strParams = new JSONObject(postParams).toString();
 		StringBuilder stringBuilder = new StringBuilder();
-		URL url = new URL(server_address + path);
+		URL url = new URL(server_address + requestPath);
 		HttpsURLConnection client = null;
 		try {
 			client = (HttpsURLConnection) url.openConnection();
@@ -125,13 +135,26 @@ class NetworkSupport {
 				response = "{}";
 			}
 		}
-		catch (IOException e){
+		catch (MalformedURLException e){
 			e.printStackTrace();
 		}
 		finally {
 			if (client != null)
 				client.disconnect();
 		}
-		return response;
 	}
+
+	@Override
+	protected Long doInBackground(URL... params) {
+		try {
+			postData();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// This counts how many bytes were downloaded
+		final byte[] result = response.getBytes();
+		return (long) result.length;
+	}
+
 }

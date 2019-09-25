@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `accounts` (
 
 DELETE FROM `accounts`;
 INSERT INTO `accounts` (`id`, `username`, `password`, `nickname`, `description`, `privileges`, `enabled`, `register_time`, `last_login`) VALUES
-	(0, 'anonymous', 'cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e', '', '', 0, 'Y', '2019-09-15 20:40:53', NULL);
+	(0, 'anonymous', 'cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e', '', '', 0, 'Y', '1999-12-31 23:59:59', NULL);
 
 -- Dumping structure for table firebasetoken
 CREATE TABLE IF NOT EXISTS `firebasetoken` (

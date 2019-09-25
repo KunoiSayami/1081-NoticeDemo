@@ -38,18 +38,22 @@ class NetworkLoginException extends Exception {
 
 }
 
+class NetworkRegisterException extends Exception {
+
+}
+
 public class LoginActivity extends AppCompatActivity {
 
-	EditText etUser, etPassword, etRepeatPassword;
-	Button btLogin, btGoRegister;
-	TextView txtTitle, txtRepeatPassword;
-	CheckBox cbRemember;
+		EditText etUser, etPassword, etRepeatPassword;
+		Button btLogin, btGoRegister;
+		TextView txtTitle, txtRepeatPassword;
+		CheckBox cbRemember;
 
-	ArrayList<TextWatcher> arrayList;
-	String TAG = "log_LoginActivity";
+		ArrayList<TextWatcher> arrayList;
+		String TAG = "log_LoginActivity";
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+		@Override
+		protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
 		this.init();
@@ -80,7 +84,7 @@ public class LoginActivity extends AppCompatActivity {
 		btGoRegister.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				NetworkSupport networkSupport = new NetworkSupport();
+				NetworkSupport networkSupport;
 				String strRegUser, strRegPassword;
 				strRegUser = etUser.getText().toString();
 				strRegPassword = etUser.getText().toString();
@@ -91,8 +95,11 @@ public class LoginActivity extends AppCompatActivity {
 				}
 
 				try {
-					HttpRawResponse httpRawResponse =
-							networkSupport.doRegister(strRegUser, strRegPassword);
+					networkSupport = new NetworkSupport(LoginActivity.this, null, NetworkRequestType.generateRegisterParams(strRegUser, strRegPassword));
+					networkSupport.execute().get();
+					HttpRawResponse httpRawResponse = JSONParser.networkJsonDecode(networkSupport.response);
+					//HttpRawResponse httpRawResponse = networkSupport.doRegister(strRegUser, strRegPassword);
+
 					if (httpRawResponse.getStatus() == 200) {
 						//((EditText)findViewById(R.id.etUser)).setText(strRegUser);
 						//((EditText)findViewById(R.id.etPassword)).setText(strRegPassword);
@@ -146,7 +153,7 @@ public class LoginActivity extends AppCompatActivity {
 		btLogin.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				NetworkSupport networkSupport = new NetworkSupport();
+				NetworkSupport networkSupport;
 				String strUser = etUser.getText().toString();
 				String strPassword = etPassword.getText().toString();
 
@@ -158,7 +165,10 @@ public class LoginActivity extends AppCompatActivity {
 
 				HttpRawResponse httpRawResponse;
 				try {
-					httpRawResponse = networkSupport.doLogin(strUser, strPassword);
+					networkSupport = new NetworkSupport(LoginActivity.this, null, NetworkRequestType.generateLoginParams(strUser, strPassword));
+					//httpRawResponse = networkSupport.doLogin(strUser, strPassword);
+					networkSupport.execute().get();
+					httpRawResponse = JSONParser.networkJsonDecode(networkSupport.response);
 					Log.d(TAG, "onClick: Status => " + httpRawResponse.getStatus());
 					if (httpRawResponse.getStatus() == 200) {
 						Toast.makeText(LoginActivity.this, "Login success", Toast.LENGTH_SHORT).show();

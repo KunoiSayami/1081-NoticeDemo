@@ -40,54 +40,27 @@ import java.util.HashMap;
 import javax.net.ssl.HttpsURLConnection;
 
 //https://stackoverflow.com/a/43146379
-class NetworkSupport extends AsyncTask<URL, Integer, Long> {
+class NetworkSupportBase extends AsyncTask<URL, Integer, Long> {
 
 	static String server_address = "";
 	static String login_path = "";
 	static String token_path = "";
 	static String register_path = "";
 
-	private static String TAG = "log_NetworkSupport";
+	private static final String TAG = "log_NetworkSupport";
 
 	String response = "";
 
-	private NetworkRequestType networkRequestType;
-	private String requestPath;
-	@SuppressLint("StaticFieldLeak")
-	private Context myContext;
+	protected NetworkRequestType networkRequestType;
+	String requestPath;
+	Context myContext;
 	HashMap<String, String> postParams;
-	Object obj;
 
 
-	NetworkSupport(Context context, String _reversed, NetworkRequestType _networkRequestType) {
+	NetworkSupportBase(Context context, String _reversed, NetworkRequestType _networkRequestType) {
 		myContext = context;
 		//GoesAddress = gowhere;
 		networkRequestType = _networkRequestType;
-		chooseType();
-	}
-
-	void chooseType(){
-		switch (this.networkRequestType.getType()) {
-			case 1:
-				//postParams.put("user", networkRequestType.getParams().get("user"));
-				postParams = networkRequestType.getParams();
-
-				// Check is login or register
-				switch (this.networkRequestType.getSubType()) {
-					case 0:
-						requestPath = login_path;
-						break;
-					case 1:
-						requestPath = register_path;
-						break;
-					default:
-						throw new RuntimeException("Path has not default value");
-				}
-				break;
-
-			default:
-				throw new RuntimeException();
-		}
 	}
 
 	private
@@ -123,7 +96,7 @@ class NetworkSupport extends AsyncTask<URL, Integer, Long> {
 						new InputStreamReader(client.getInputStream())
 				);
 				while ((line = bufferedReader.readLine()) != null){
-					Log.d(TAG, "postData: line => " + line);
+					//Log.d(TAG, "postData: line => " + line);
 					stringBuilder.append(line);
 					//response += line;
 				}
@@ -141,8 +114,13 @@ class NetworkSupport extends AsyncTask<URL, Integer, Long> {
 		finally {
 			if (client != null)
 				client.disconnect();
+			//Log.d(TAG, "postData: Finish");
 		}
+		//Log.d(TAG, "postData: Finish Response => " + response);
+		//callback();
 	}
+
+	public void callback() {}
 
 	@Override
 	protected Long doInBackground(URL... params) {

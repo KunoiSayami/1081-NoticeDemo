@@ -65,10 +65,10 @@ public class MainActivity extends AppCompatActivity {
 		);
 		if (jsonObjects != null) {
 			try {
-				NetworkSupport.server_address = jsonObjects[0].get(getString(R.string.server_address_field)).toString();
-				NetworkSupport.login_path = jsonObjects[1].get(getString(R.string.login_field)).toString();
-				NetworkSupport.token_path = jsonObjects[1].get(getString(R.string.token_field)).toString();
-				NetworkSupport.register_path = jsonObjects[1].get(getString(R.string.register_field)).toString();
+				NetworkSupportBase.server_address = jsonObjects[0].get(getString(R.string.server_address_field)).toString();
+				NetworkSupportBase.login_path = jsonObjects[1].get(getString(R.string.login_field)).toString();
+				NetworkSupportBase.token_path = jsonObjects[1].get(getString(R.string.token_field)).toString();
+				NetworkSupportBase.register_path = jsonObjects[1].get(getString(R.string.register_field)).toString();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

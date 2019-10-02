@@ -24,7 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-public class HttpRawResponse {
+class HttpRawResponse {
 	private int status;
 	private JSONArray options;
 	private JSONObject errors;
@@ -43,6 +43,6 @@ public class HttpRawResponse {
 	}
 
 	JSONObject getErrors() {
-		return getErrors();
+		return errors;
 	}
 }

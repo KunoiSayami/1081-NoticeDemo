@@ -84,32 +84,22 @@ public class LoginActivity extends AppCompatActivity {
 		btGoRegister.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				NetworkSupport networkSupport;
+				AccountNetworkSupport networkSupport;
 				String strRegUser, strRegPassword;
 				strRegUser = etUser.getText().toString();
-				strRegPassword = etUser.getText().toString();
+				strRegPassword = etPassword.getText().toString();
 
 				if (strRegPassword.length() == 0) {
 					strRegUser = "test";
 					strRegPassword = "test";
+					etUser.setText(strRegUser);
+					etPassword.setText(strRegPassword);
+					etRepeatPassword.setText(strRegPassword);
 				}
 
 				try {
-					networkSupport = new NetworkSupport(LoginActivity.this, null, NetworkRequestType.generateRegisterParams(strRegUser, strRegPassword));
-					networkSupport.execute().get();
-					HttpRawResponse httpRawResponse = JSONParser.networkJsonDecode(networkSupport.response);
-					//HttpRawResponse httpRawResponse = networkSupport.doRegister(strRegUser, strRegPassword);
-
-					if (httpRawResponse.getStatus() == 200) {
-						//((EditText)findViewById(R.id.etUser)).setText(strRegUser);
-						//((EditText)findViewById(R.id.etPassword)).setText(strRegPassword);
-						Toast.makeText(LoginActivity.this, "Register success", Toast.LENGTH_SHORT).show();
-						// https://stackoverflow.com/a/4038637
-						backToLoginPage();
-					}
-					else {
-						throw new NetworkRegisterException();
-					}
+					networkSupport = new AccountNetworkSupport(LoginActivity.this, strRegUser, strRegPassword, true);
+					networkSupport.execute();
 				} catch (Exception e){
 					e.printStackTrace();
 				}
@@ -153,7 +143,7 @@ public class LoginActivity extends AppCompatActivity {
 		btLogin.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				NetworkSupport networkSupport;
+				AccountNetworkSupport networkSupport;
 				String strUser = etUser.getText().toString();
 				String strPassword = etPassword.getText().toString();
 
@@ -163,23 +153,9 @@ public class LoginActivity extends AppCompatActivity {
 					strPassword = "test";
 				}
 
-				HttpRawResponse httpRawResponse;
 				try {
-					networkSupport = new NetworkSupport(LoginActivity.this, null, NetworkRequestType.generateLoginParams(strUser, strPassword));
-					//httpRawResponse = networkSupport.doLogin(strUser, strPassword);
-					networkSupport.execute().get();
-					httpRawResponse = JSONParser.networkJsonDecode(networkSupport.response);
-					Log.d(TAG, "onClick: Status => " + httpRawResponse.getStatus());
-					if (httpRawResponse.getStatus() == 200) {
-						Toast.makeText(LoginActivity.this, "Login success", Toast.LENGTH_SHORT).show();
-						if (cbRemember.isChecked()){
-							MainActivity.databaseHelper.updateUser(strUser, strPassword);
-						}
-					}
-					else {
-						throw new NetworkLoginException();
-					}
-					MainActivity.databaseHelper.setRememberedPassword(cbRemember.isChecked());
+					networkSupport = new AccountNetworkSupport(LoginActivity.this, strUser, strPassword, false);
+					networkSupport.execute();
 				} catch (Exception e) {
 					e.printStackTrace();
 					Toast.makeText(LoginActivity.this,"Login error", Toast.LENGTH_SHORT).show();
@@ -189,7 +165,10 @@ public class LoginActivity extends AppCompatActivity {
 
 	}
 
+
 	void init() {
+		arrayList = new ArrayList<>();
+
 		etUser = findViewById(R.id.etUser);
 		etPassword = findViewById(R.id.etPassword);
 		btLogin = findViewById(R.id.btLogin);

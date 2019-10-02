@@ -42,7 +42,7 @@ class NetworkRegisterException extends Exception {
 
 }
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity{
 
 		EditText etUser, etPassword, etRepeatPassword;
 		Button btLogin, btGoRegister;
@@ -51,6 +51,8 @@ public class LoginActivity extends AppCompatActivity {
 
 		ArrayList<TextWatcher> arrayList;
 		String TAG = "log_LoginActivity";
+
+		boolean _register_status = false;
 
 		@Override
 		protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +77,7 @@ public class LoginActivity extends AppCompatActivity {
 	}
 
 	void changeToRegisterLayout() {
+		_register_status = true;
 		txtTitle.setText(getString(R.string.text_title_register_page));
 		txtRepeatPassword.setVisibility(View.VISIBLE);
 		etRepeatPassword.setVisibility(View.VISIBLE);
@@ -99,6 +102,12 @@ public class LoginActivity extends AppCompatActivity {
 
 				try {
 					networkSupport = new AccountNetworkSupport(LoginActivity.this, strRegUser, strRegPassword, true);
+					networkSupport.Task(new OnTaskCompleted() {
+						@Override
+						public void onTaskCompleted(HttpRawResponse httpRawResponse) {
+							callback(httpRawResponse);
+						}
+					});
 					networkSupport.execute();
 				} catch (Exception e){
 					e.printStackTrace();
@@ -117,6 +126,7 @@ public class LoginActivity extends AppCompatActivity {
 	}
 
 	void backToLoginPage() {
+		_register_status = false;
 		txtTitle.setText(R.string.text_title_login_page);
 		txtRepeatPassword.setVisibility(View.INVISIBLE);
 		etRepeatPassword.setVisibility(View.INVISIBLE);
@@ -138,6 +148,22 @@ public class LoginActivity extends AppCompatActivity {
 
 	}
 
+	private
+	String getUser() {
+		String strUser = etUser.getText().toString();
+		if (etPassword.length() == 0)
+			strUser = "test";
+		return strUser;
+	}
+
+	private
+	String getPassword() {
+		String strPassword = etPassword.getText().toString();
+		if (strPassword.length() == 0)
+			strPassword = "test";
+		return strPassword;
+	}
+
 	void initbtnlogin() {
 
 		btLogin.setOnClickListener(new View.OnClickListener() {
@@ -155,6 +181,12 @@ public class LoginActivity extends AppCompatActivity {
 
 				try {
 					networkSupport = new AccountNetworkSupport(LoginActivity.this, strUser, strPassword, false);
+					networkSupport.Task(new OnTaskCompleted() {
+						@Override
+						public void onTaskCompleted(HttpRawResponse httpRawResponse) {
+							callback(httpRawResponse);
+						}
+					});
 					networkSupport.execute();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -251,5 +283,42 @@ public class LoginActivity extends AppCompatActivity {
 			public void afterTextChanged(Editable s) { }
 		});
 
+	}
+
+	public void callback(HttpRawResponse httpRawResponse) {
+		try {
+			Log.d(TAG, "register_callback: Status => " + httpRawResponse.getStatus());
+			if (_register_status)
+				register_callback(httpRawResponse);
+			else
+				login_callback(httpRawResponse);
+		}
+		catch (Exception e){
+			e.printStackTrace();
+			Toast.makeText(LoginActivity.this,  (_register_status ? "Register": "Login")+" error", Toast.LENGTH_SHORT).show();
+		}
+	}
+	void register_callback(HttpRawResponse httpRawResponse) {
+		if (httpRawResponse.getStatus() == 200) {
+			Toast.makeText(LoginActivity.this, "Register success", Toast.LENGTH_SHORT).show();
+			backToLoginPage();
+		}
+		else {
+			// ERROR PROCESS GOES HERE
+		}
+
+	}
+
+	void login_callback(HttpRawResponse httpRawResponse) {
+		if (httpRawResponse.getStatus() == 200) {
+			Toast.makeText(this, "Login success", Toast.LENGTH_SHORT).show();
+			if (cbRemember.isChecked()) {
+				MainActivity.databaseHelper.updateUser(this.getUser(), this.getPassword());
+			}
+			else {
+				// ERROR PROCESS GOES HERE
+			}
+		}
+		MainActivity.databaseHelper.setRememberedPassword(cbRemember.isChecked());
 	}
 }

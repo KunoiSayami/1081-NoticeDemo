@@ -7,11 +7,13 @@ import android.widget.Toast;
 import java.security.NoSuchAlgorithmException;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.xml.transform.Result;
 
 public class AccountNetworkSupport extends NetworkSupportBase {
 	private static final String TAG = "log_AccountNetworkSupport";
 	private boolean _is_register;
 	private String _user, _password;
+	private OnTaskCompleted listener;
 	AccountNetworkSupport(Context context, String user, String password, boolean is_register)
 			throws NoSuchAlgorithmException {
 		super(context, "",
@@ -30,45 +32,13 @@ public class AccountNetworkSupport extends NetworkSupportBase {
 		requestPath = _is_register? register_path : login_path;
 	}
 
-	// If finished, call this function
-	@Override
-	void callback() {
-		try {
-			HttpRawResponse httpRawResponse = JSONParser.networkJsonDecode(response);
-			Log.d(TAG, "register_callback: Status => " + httpRawResponse.getStatus());
-			if (this._is_register)
-				register_callback(httpRawResponse);
-			else
-				login_callback(httpRawResponse);
-		}
-		catch (Exception e){
-			e.printStackTrace();
-			Toast.makeText(myContext,  (_is_register ? "Register": "Login")+" error", Toast.LENGTH_SHORT).show();
-		}
+
+	public void Task(OnTaskCompleted listener) {
+		this.listener = listener;
 	}
 
-
-	void register_callback(HttpRawResponse httpRawResponse) {
-		if (httpRawResponse.getStatus() == HttpsURLConnection.HTTP_OK) {
-			Toast.makeText(myContext, "Register success", Toast.LENGTH_SHORT).show();
-			((LoginActivity)myContext).backToLoginPage();
-		}
-		else {
-			// ERROR PROCESS GOES HERE
-		}
-
-	}
-
-	void login_callback(HttpRawResponse httpRawResponse) {
-		if (httpRawResponse.getStatus() == HttpsURLConnection.HTTP_OK) {
-			Toast.makeText(myContext, "Login success", Toast.LENGTH_SHORT).show();
-			if (((LoginActivity)myContext).cbRemember.isChecked()) {
-				MainActivity.databaseHelper.updateUser(_user, _password);
-			}
-			else {
-				// ERROR PROCESS GOES HERE
-			}
-		}
-		MainActivity.databaseHelper.setRememberedPassword(((LoginActivity)myContext).cbRemember.isChecked());
+	protected void onPostExecute(Long _reserved) {
+		super.onPostExecute(_reserved);
+		listener.onTaskCompleted(JSONParser.networkJsonDecode(response));
 	}
 }

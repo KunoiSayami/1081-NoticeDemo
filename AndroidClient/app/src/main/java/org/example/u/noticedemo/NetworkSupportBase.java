@@ -38,6 +38,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.xml.transform.Result;
 
 //https://stackoverflow.com/a/43146379
 class NetworkSupportBase extends AsyncTask<URL, Integer, Long> {
@@ -117,10 +118,7 @@ class NetworkSupportBase extends AsyncTask<URL, Integer, Long> {
 			//Log.d(TAG, "postData: Finish");
 		}
 		//Log.d(TAG, "postData: Finish Response => " + response);
-		//callback();
 	}
-
-	public void callback() {}
 
 	@Override
 	protected Long doInBackground(URL... params) {
@@ -135,4 +133,7 @@ class NetworkSupportBase extends AsyncTask<URL, Integer, Long> {
 		return (long) result.length;
 	}
 
+	protected void onPostExecute(Long _reserved) {
+		super.onPostExecute(_reserved);
+	}
 }

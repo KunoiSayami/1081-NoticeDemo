@@ -36,9 +36,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import javax.net.ssl.HttpsURLConnection;
-import javax.xml.transform.Result;
 
 //https://stackoverflow.com/a/43146379
 class NetworkSupportBase extends AsyncTask<URL, Integer, Long> {
@@ -52,16 +52,16 @@ class NetworkSupportBase extends AsyncTask<URL, Integer, Long> {
 
 	String response = "";
 
-	protected NetworkRequestType networkRequestType;
+	NetworkRequestType networkRequestType;
 	String requestPath;
 	Context myContext;
-	HashMap<String, String> postParams;
-
+	HashMap<String, String> postParams, headerParmas;
 
 	NetworkSupportBase(Context context, String _reversed, NetworkRequestType _networkRequestType) {
 		myContext = context;
 		//GoesAddress = gowhere;
 		networkRequestType = _networkRequestType;
+
 	}
 
 	private
@@ -76,6 +76,14 @@ class NetworkSupportBase extends AsyncTask<URL, Integer, Long> {
 			client.setRequestMethod("POST");
 			client.setRequestProperty("Accept-Charset", "utf8");
 			client.setRequestProperty("Content-Type", "application/json");
+			if (headerParmas != null) {
+				Iterator it = headerParmas.entrySet().iterator();
+				while (it.hasNext()) {
+					HashMap.Entry pair = (HashMap.Entry)it.next();
+					client.setRequestProperty((String)pair.getKey(), (String)pair.getValue());
+					it.remove();
+				}
+			}
 
 			client.setDoInput(true);
 			client.setDoOutput(true);

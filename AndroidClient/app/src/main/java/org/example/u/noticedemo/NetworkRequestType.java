@@ -33,11 +33,12 @@ class enumMinorType {
 
 public class NetworkRequestType {
 	int type, subType;
-	HashMap<String, String> params;
-	NetworkRequestType(int _type, int _subType, HashMap<String, String> _hashMap){
+	HashMap<String, String> params, headers;
+	NetworkRequestType(int _type, int _subType, HashMap<String, String> _hashMap, HashMap<String, String> _headers){
 		type = _type;
 		subType = _subType;
 		params = _hashMap;
+		headers = _headers;
 	}
 
 	public int getType() {
@@ -48,16 +49,20 @@ public class NetworkRequestType {
 		return subType;
 	}
 
-	public HashMap<String, String> getParams() {
+	HashMap<String, String> getParams() {
 		return params;
 	}
 
-	public static NetworkRequestType generateRegisterParams(String user, String password)
+	HashMap<String, String> getHeaders() {
+		return headers;
+	}
+
+	static NetworkRequestType generateRegisterParams(String user, String password)
 			throws NoSuchAlgorithmException{
 		return _generateAccountAction(user, password, enumMinorType.ACCOUNT.REGISTER);
 	}
 
-	public static NetworkRequestType generateLoginParams(String user, String password)
+	static NetworkRequestType generateLoginParams(String user, String password)
 			throws NoSuchAlgorithmException{
 		return _generateAccountAction(user, password, enumMinorType.ACCOUNT.LOGIN);
 	}
@@ -65,8 +70,9 @@ public class NetworkRequestType {
 	public static NetworkRequestType generateRegisterFirebaseIDParams(String firebaseID, String sessionStr){
 		HashMap<String, String> params = new HashMap<>();
 		params.put("firebaseID", firebaseID);
-		params.put("auth", sessionStr);
-		return new NetworkRequestType(enumMajorType.FIREBASE, enumMinorType.FIREBASE.REGISTER, params);
+		HashMap<String, String> _headers = new HashMap<>();
+		_headers.put("auth", sessionStr);
+		return new NetworkRequestType(enumMajorType.FIREBASE, enumMinorType.FIREBASE.REGISTER, params, _headers);
 	}
 
 	private
@@ -75,6 +81,6 @@ public class NetworkRequestType {
 		HashMap<String, String> params = new HashMap<>();
 		params.put("user", user);
 		params.put("password", getHashedPassword(password));
-		return new NetworkRequestType(enumMajorType.ACCOUNT, ActionType, params);
+		return new NetworkRequestType(enumMajorType.ACCOUNT, ActionType, params, null);
 	}
 }

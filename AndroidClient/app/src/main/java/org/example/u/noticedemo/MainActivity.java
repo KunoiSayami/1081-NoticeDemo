@@ -39,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
 
 	String TAG = "log_Main";
 	static DatabaseHelper databaseHelper;
+	static String user_auth = "";
+	static String firebase_id = "";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
 
 	void init(){
 		MainActivity.databaseHelper = new DatabaseHelper(this);
+		user_auth = databaseHelper.getSessionString();
 		FirebaseInstanceId.getInstance().getInstanceId()
 				.addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
 					@Override
@@ -93,14 +96,20 @@ public class MainActivity extends AppCompatActivity {
 
 						// Get new Instance ID token
 						String token = task.getResult().getToken();
-
+						firebase_id = token;
 						// Log and toast
 						String msg = getString(R.string.msg_token_fmt, token);
 						Log.d(TAG, msg);
 						Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
 					}
 				});
-
+		try {
+			FirebaseNetworkSupport firebaseNetworkSupport = new FirebaseNetworkSupport(MainActivity.this, firebase_id);
+			firebaseNetworkSupport.execute();
+			Log.d(TAG, "init: Register firebase id successful");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 

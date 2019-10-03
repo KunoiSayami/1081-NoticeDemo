@@ -45,4 +45,14 @@ class HttpRawResponse {
 	JSONObject getErrors() {
 		return errors;
 	}
+
+	String getSessionString() {
+		try {
+			return options.get(0).toString();
+		}
+		catch (JSONException e){
+			e.printStackTrace();
+		}
+		return "";
+	}
 }

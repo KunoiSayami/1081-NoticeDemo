@@ -1,11 +1,14 @@
 def generate_error_dict(code: int, info: str):
     return {'code': code, 'info': info}
 
-def SUCCESS_LOGIN():
+def SUCCESS_200OK():
     return (200, [], generate_error_dict(0, ''))
 
+def SUCCESS_LOGIN(session_string: str):
+    return (200, [session_string], generate_error_dict(0, ''))
+
 def SUCCESS_REGISTER():
-    return (200, [], generate_error_dict(0, ''))
+    return SUCCESS_200OK()
 
 def ERROR_INVALID_PASSWORD_OR_USER():
     return (403, [], generate_error_dict(1, 'Invalid password or username'))
@@ -15,3 +18,12 @@ def ERROR_USERNAME_ALREADY_EXIST():
 
 def ERROR_USERNAME_TOO_LONG():
     return (400, [], generate_error_dict(3, 'User name should be shorter then 16'))
+
+def ERROR_USER_SESSION_INVALID():
+    return (400, [], generate_error_dict(4, 'User session invalid'))
+
+def ERROR_USER_SESSION_EXPIRED():
+    return (400, [], generate_error_dict(5, 'User session expired'))
+
+def SUCCESS_REGISTER_FIREBASE_ID():
+    return SUCCESS_200OK()

@@ -104,8 +104,8 @@ public class LoginActivity extends AppCompatActivity{
 					networkSupport = new AccountNetworkSupport(LoginActivity.this, strRegUser, strRegPassword, true);
 					networkSupport.Task(new OnTaskCompleted() {
 						@Override
-						public void onTaskCompleted(HttpRawResponse httpRawResponse) {
-							callback(httpRawResponse);
+						public void onTaskCompleted(Object httpRawResponse) {
+							callback((HttpRawResponse) httpRawResponse);
 						}
 					});
 					networkSupport.execute();
@@ -183,8 +183,8 @@ public class LoginActivity extends AppCompatActivity{
 					networkSupport = new AccountNetworkSupport(LoginActivity.this, strUser, strPassword, false);
 					networkSupport.Task(new OnTaskCompleted() {
 						@Override
-						public void onTaskCompleted(HttpRawResponse httpRawResponse) {
-							callback(httpRawResponse);
+						public void onTaskCompleted(Object httpRawResponse) {
+							callback((HttpRawResponse) httpRawResponse);
 						}
 					});
 					networkSupport.execute();
@@ -311,6 +311,8 @@ public class LoginActivity extends AppCompatActivity{
 
 	void login_callback(HttpRawResponse httpRawResponse) {
 		if (httpRawResponse.getStatus() == 200) {
+			MainActivity.user_auth = httpRawResponse.getSessionString();
+			MainActivity.databaseHelper.setSessionString(MainActivity.user_auth);
 			Toast.makeText(this, "Login success", Toast.LENGTH_SHORT).show();
 			if (cbRemember.isChecked()) {
 				MainActivity.databaseHelper.updateUser(this.getUser(), this.getPassword());

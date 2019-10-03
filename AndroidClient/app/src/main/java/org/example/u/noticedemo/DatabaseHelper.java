@@ -27,12 +27,12 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 	Context context;
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 	private static String DATABASE_NAME = "n0t1c3.db";
 	private static String TABLE_ACCOUNT = "Account";
 	private static String TABLE_OPTION = "Option";
 	private static String CREATE_ACCOUNT = "CREATE TABLE `Account` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `user` TEXT, `password` TEXT)";
-	private static String CREATE_OPTION = "CREATE TABLE `Option` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remember_password` BOOLEAN)";
+	private static String CREATE_OPTION = "CREATE TABLE `Option` (`name` TEXT PRIMARY KEY, `value` TEXT)";
 	public DatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
 		super(context, name, factory, version);
 		this.context = context;
@@ -50,7 +50,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL(CREATE_ACCOUNT);
 		db.execSQL(CREATE_OPTION);
-		db.execSQL("INSERT INTO `Option` (`remember_password`) VALUES (0)");
+		db.execSQL("INSERT INTO `Option` (`name`, `value`) VALUES" +
+				" (\"remember_password\", \"false\"), (\"session_string\", \"\")");
 		//init();
 	}
 
@@ -61,26 +62,43 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		onCreate(db);
 	}
 
-	public boolean isRememberedPassword() {
-		String sql = "SELECT * FROM `Option` LIMIT 1";
+	boolean isRememberedPassword() {
+		String sql = "SELECT * FROM `Option` WHERE `name` = \"remember_password\"";
 		SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
 		Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
 		cursor.moveToFirst();
 		// https://stackoverflow.com/a/4088131
-		boolean remember_password = cursor.getInt(cursor.getColumnIndexOrThrow("remember_password")) > 0;
+		boolean remember_password = cursor.getString(cursor.getColumnIndexOrThrow("remember_password")).equals("true");
 		cursor.close();
 		return remember_password;
 	}
 
-	public void setRememberedPassword(boolean b) {
+	void setRememberedPassword(boolean b) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues contentValues = new ContentValues();
-		contentValues.put("remember_password", false);
-		db.update(TABLE_OPTION, contentValues, "id = 1",null);
+		contentValues.put("value", b? "true": "false");
+		db.update(TABLE_OPTION, contentValues, "name = ?", new String[]{"remember_password"});
 		db.close();
 	}
 
-	public String[] getStoredUser() {
+	void setSessionString(String sessionString) {
+		SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+		ContentValues contentValues = new ContentValues();
+		contentValues.put("value", sessionString);
+		sqLiteDatabase.update(TABLE_OPTION, contentValues, "name = ?", new String[]{"session_string"});
+		sqLiteDatabase.close();
+	}
+
+	String getSessionString() {
+		String sql = "SELECT `value` FROM `Option` WHERE `name` = \"sesstion_string\"";
+		SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+		Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
+		String string = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+		cursor.close();
+		return string;
+	}
+
+	String[] getStoredUser() {
 		String[] accountGroup = new String[2];
 		String sql = "SELECT * FROM `Account` ORDER BY `id` DESC LIMIT 1";
 		SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
@@ -98,7 +116,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		return accountGroup;
 	}
 
-	public void updateUser(String user, String password) {
+	void updateUser(String user, String password) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		db.execSQL("DELETE FROM `Account`");
 		ContentValues contentValues = new ContentValues();

@@ -1,13 +1,8 @@
 package org.example.u.noticedemo;
 
 import android.content.Context;
-import android.util.Log;
-import android.widget.Toast;
 
 import java.security.NoSuchAlgorithmException;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.xml.transform.Result;
 
 public class AccountNetworkSupport extends NetworkSupportBase {
 	private static final String TAG = "log_AccountNetworkSupport";
@@ -32,8 +27,7 @@ public class AccountNetworkSupport extends NetworkSupportBase {
 		requestPath = _is_register? register_path : login_path;
 	}
 
-
-	public void Task(OnTaskCompleted listener) {
+	void Task(OnTaskCompleted listener) {
 		this.listener = listener;
 	}
 

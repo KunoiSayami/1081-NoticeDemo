@@ -1,16 +1,5 @@
 <resources>
     <string name="app_name">NoticeDemo</string>
-    <string name="msg_token_fmt">Token: %s</string>
-    <string name="request_fmt">%s%s</string>
-
-    <!-- Json field name -->
-    <string name="server_address_field">server_address</string>
-    <string name="login_field">login</string>
-    <string name="token_field">token</string>
-    <string name="do_field">token</string>
-    <string name="refresh_field">refresh</string>
-    <string name="register_field">register</string>
-    <!-- Json field name end -->
 
     <!-- login page -->
     <string name="text_login">LOGIN</string>

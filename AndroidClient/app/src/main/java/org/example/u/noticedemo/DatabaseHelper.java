@@ -24,34 +24,30 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 	Context context;
-	private static final int DATABASE_VERSION = 2;
-	private static String DATABASE_NAME = "n0t1c3.db";
-	private static String TABLE_ACCOUNT = "Account";
-	private static String TABLE_OPTION = "Option";
-	private static String CREATE_ACCOUNT = "CREATE TABLE `Account` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `user` TEXT, `password` TEXT)";
-	private static String CREATE_OPTION = "CREATE TABLE `Option` (`name` TEXT PRIMARY KEY, `value` TEXT)";
-	public DatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
+	private static final int DATABASE_VERSION = 4;
+	private final static String DATABASE_NAME = "n0t1c3.db";
+	private final static String TABLE_ACCOUNT = "Account";
+	private final static String TABLE_OPTION = "Option";
+	private final static String CREATE_ACCOUNT = "CREATE TABLE `Account` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `user` TEXT, `password` TEXT)";
+	private final static String CREATE_OPTION = "CREATE TABLE `Option` (`name` TEXT PRIMARY KEY, `value` TEXT)";
+
+	private final static String TAG = "log_Database";
+
+	DatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
 		super(context, name, factory, version);
 		this.context = context;
 	}
-
-	/*void init() {
-		SQLiteDatabase db = this.getWritableDatabase();
-		ContentValues contentValues = new ContentValues();
-		contentValues.put("remember_password", false);
-		db.insert(TABLE_OPTION, null, contentValues);;
-		db.close();
-	}*/
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL(CREATE_ACCOUNT);
 		db.execSQL(CREATE_OPTION);
 		db.execSQL("INSERT INTO `Option` (`name`, `value`) VALUES" +
-				" (\"remember_password\", \"false\"), (\"session_string\", \"\")");
+				" (\"remember_password\", \"false\"), (\"session_string\", \"\"), (\"user_name\", \"\")");
 		//init();
 	}
 
@@ -68,7 +64,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
 		cursor.moveToFirst();
 		// https://stackoverflow.com/a/4088131
-		boolean remember_password = cursor.getString(cursor.getColumnIndexOrThrow("remember_password")).equals("true");
+		boolean remember_password = cursor.getString(cursor.getColumnIndexOrThrow("value")).equals("true");
 		cursor.close();
 		return remember_password;
 	}
@@ -77,7 +73,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues contentValues = new ContentValues();
 		contentValues.put("value", b? "true": "false");
-		db.update(TABLE_OPTION, contentValues, "name = ?", new String[]{"remember_password"});
+		db.update(TABLE_OPTION, contentValues, "name = ?", new String[]{"value"});
 		db.close();
 	}
 
@@ -90,10 +86,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	}
 
 	String getSessionString() {
-		String sql = "SELECT `value` FROM `Option` WHERE `name` = \"sesstion_string\"";
+		String sql = "SELECT `value` FROM `Option` WHERE `name` = \"session_string\"";
 		SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
 		Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
-		String string = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+		cursor.moveToFirst();
+		String string = cursor.getString(cursor.getColumnIndexOrThrow("value"));
 		cursor.close();
 		return string;
 	}
@@ -126,7 +123,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		db.close();
 	}
 
-	public DatabaseHelper(Context context){
+	DatabaseHelper(Context context){
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		this.context = context;
 	}

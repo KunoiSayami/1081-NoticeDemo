@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="help_message_1">Invalid password or username</string>
+    <string name="help_message_2">Username already exist</string>
+    <string name="help_message_3">User name should be shorter then 16</string>
+    <string name="help_message_4">User session invalid</string>
+    <string name="help_message_5">User session expired</string>
+    <string name="help_message_default">UNKNOWN ERROR, PLEASE UPGRADE APP TO CONTINUE</string>
+</resources>

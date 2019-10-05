@@ -1,5 +1,7 @@
 package org.example.u.noticedemo;
 
+import android.net.Network;
+
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
@@ -14,6 +16,7 @@ import static org.example.u.noticedemo.SHA512Support.getHashedPassword;
 *	1:
 * 	  0. Login event
 *	  1. Register Event
+* 	  2. Verify session
 */
 
 class enumMajorType {
@@ -25,6 +28,8 @@ class enumMinorType {
 	static class ACCOUNT {
 		final static int LOGIN = 0;
 		final static int REGISTER = 1;
+		final static int VERIFY = 2;
+		final static int LOGOUT = 3;
 	}
 	static class FIREBASE {
 		final static int REGISTER = 0;
@@ -32,12 +37,15 @@ class enumMinorType {
 }
 
 public class NetworkRequestType {
-	int type, subType;
-	HashMap<String, String> params, headers;
-	NetworkRequestType(int _type, int _subType, HashMap<String, String> _hashMap, HashMap<String, String> _headers){
+	private int type, subType;
+	private HashMap<String, String> params, headers;
+	NetworkRequestType(int _type, int _subType, HashMap<String, String> _params, HashMap<String, String> _headers){
 		type = _type;
 		subType = _subType;
-		params = _hashMap;
+		params = _params;
+		if (params == null) {
+			params = new HashMap<>();
+		}
 		headers = _headers;
 	}
 
@@ -57,6 +65,19 @@ public class NetworkRequestType {
 		return headers;
 	}
 
+	static NetworkRequestType generateLogoutParams(String session_string) {
+		HashMap<String, String> _headers = new HashMap<>();
+		_headers.put("A-auth", session_string);
+		return new NetworkRequestType(enumMajorType.ACCOUNT, enumMinorType.ACCOUNT.LOGOUT, null, _headers);
+	}
+
+	static NetworkRequestType generateVerifyParams(String user, String session_string) {
+		HashMap<String, String> _headers = new HashMap<>();
+		_headers.put("A-user", user);
+		_headers.put("A-auth", session_string);
+		return new NetworkRequestType(enumMajorType.ACCOUNT, enumMinorType.ACCOUNT.VERIFY, null, _headers);
+	}
+
 	static NetworkRequestType generateRegisterParams(String user, String password)
 			throws NoSuchAlgorithmException{
 		return _generateAccountAction(user, password, enumMinorType.ACCOUNT.REGISTER);
@@ -67,11 +88,11 @@ public class NetworkRequestType {
 		return _generateAccountAction(user, password, enumMinorType.ACCOUNT.LOGIN);
 	}
 
-	public static NetworkRequestType generateRegisterFirebaseIDParams(String firebaseID, String sessionStr){
+	static NetworkRequestType generateRegisterFirebaseIDParams(String firebaseID, String sessionStr){
 		HashMap<String, String> params = new HashMap<>();
 		params.put("firebaseID", firebaseID);
 		HashMap<String, String> _headers = new HashMap<>();
-		_headers.put("auth", sessionStr);
+		_headers.put("A-auth", sessionStr);
 		return new NetworkRequestType(enumMajorType.FIREBASE, enumMinorType.FIREBASE.REGISTER, params, _headers);
 	}
 

@@ -19,6 +19,7 @@
 */
 package org.example.u.noticedemo;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -31,6 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.util.ArrayList;
 
@@ -44,17 +46,19 @@ class NetworkRegisterException extends Exception {
 
 public class LoginActivity extends AppCompatActivity{
 
-		EditText etUser, etPassword, etRepeatPassword;
-		Button btLogin, btGoRegister;
-		TextView txtTitle, txtRepeatPassword;
-		CheckBox cbRemember;
+	EditText etUser, etPassword, etRepeatPassword;
+	Button btLogin, btGoRegister;
+	TextView txtTitle, txtRepeatPassword;
+	CheckBox cbRemember;
 
-		ArrayList<TextWatcher> arrayList;
-		String TAG = "log_LoginActivity";
+	ArrayList<TextWatcher> arrayList;
+	String TAG = "log_LoginActivity";
 
-		boolean _register_status = false;
+	private CallbackLister lister;
 
-		@Override
+	boolean _register_status = false;
+
+	@Override
 		protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
@@ -74,6 +78,10 @@ public class LoginActivity extends AppCompatActivity{
 		etPassword.addTextChangedListener(arrayList.get(1));
 
 		etRepeatPassword.addTextChangedListener(arrayList.get(2));
+	}
+
+	void onAfterLogin(CallbackLister _lister) {
+		this.lister = _lister;
 	}
 
 	void changeToRegisterLayout() {
@@ -144,8 +152,6 @@ public class LoginActivity extends AppCompatActivity{
 
 		btLogin.setText(R.string.text_login);
 		initbtnlogin();
-
-
 	}
 
 	private
@@ -290,8 +296,11 @@ public class LoginActivity extends AppCompatActivity{
 			Log.d(TAG, "register_callback: Status => " + httpRawResponse.getStatus());
 			if (_register_status)
 				register_callback(httpRawResponse);
-			else
+			else {
 				login_callback(httpRawResponse);
+				if (lister != null)
+					lister.onCallback(null);
+			}
 		}
 		catch (Exception e){
 			e.printStackTrace();
@@ -313,6 +322,7 @@ public class LoginActivity extends AppCompatActivity{
 		if (httpRawResponse.getStatus() == 200) {
 			MainActivity.user_auth = httpRawResponse.getSessionString();
 			MainActivity.databaseHelper.setSessionString(MainActivity.user_auth);
+			MainActivity.reportFirebaseId(LoginActivity.this, MainActivity.firebase_id);
 			Toast.makeText(this, "Login success", Toast.LENGTH_SHORT).show();
 			if (cbRemember.isChecked()) {
 				MainActivity.databaseHelper.updateUser(this.getUser(), this.getPassword());
@@ -322,5 +332,7 @@ public class LoginActivity extends AppCompatActivity{
 			}
 		}
 		MainActivity.databaseHelper.setRememberedPassword(cbRemember.isChecked());
+		LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(getString(R.string.IntentFilter_login_success)));
+		finish();
 	}
 }

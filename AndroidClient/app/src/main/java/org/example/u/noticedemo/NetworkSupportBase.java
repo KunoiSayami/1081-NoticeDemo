@@ -19,10 +19,8 @@
 */
 package org.example.u.noticedemo;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -40,13 +38,10 @@ import java.util.Iterator;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import static org.example.u.noticedemo.NetworkPath.server_address;
+
 //https://stackoverflow.com/a/43146379
 class NetworkSupportBase extends AsyncTask<URL, Integer, Long> {
-
-	static String server_address = "";
-	static String login_path = "";
-	static String token_path = "";
-	static String register_path = "";
 
 	private static final String TAG = "log_NetworkSupport";
 
@@ -55,13 +50,23 @@ class NetworkSupportBase extends AsyncTask<URL, Integer, Long> {
 	NetworkRequestType networkRequestType;
 	String requestPath;
 	Context myContext;
-	HashMap<String, String> postParams, headerParmas;
+	HashMap<String, String> postParams, headerParams;
 
-	NetworkSupportBase(Context context, String _reversed, NetworkRequestType _networkRequestType) {
+	private OnTaskCompleted listener = null;
+
+	NetworkSupportBase(Context context,
+					   String _reversed,
+					   NetworkRequestType _networkRequestType,
+					   String request_path,
+					   OnTaskCompleted _listener)
+	{
 		myContext = context;
 		//GoesAddress = gowhere;
 		networkRequestType = _networkRequestType;
-
+		postParams = _networkRequestType.getParams();
+		headerParams = _networkRequestType.getHeaders();
+		requestPath = request_path;
+		listener = _listener;
 	}
 
 	private
@@ -76,8 +81,8 @@ class NetworkSupportBase extends AsyncTask<URL, Integer, Long> {
 			client.setRequestMethod("POST");
 			client.setRequestProperty("Accept-Charset", "utf8");
 			client.setRequestProperty("Content-Type", "application/json");
-			if (headerParmas != null) {
-				Iterator it = headerParmas.entrySet().iterator();
+			if (headerParams != null) {
+				Iterator it = headerParams.entrySet().iterator();
 				while (it.hasNext()) {
 					HashMap.Entry pair = (HashMap.Entry)it.next();
 					client.setRequestProperty((String)pair.getKey(), (String)pair.getValue());
@@ -141,7 +146,14 @@ class NetworkSupportBase extends AsyncTask<URL, Integer, Long> {
 		return (long) result.length;
 	}
 
+
+	void Task(OnTaskCompleted listener) {
+		this.listener = listener;
+	}
+
 	protected void onPostExecute(Long _reserved) {
 		super.onPostExecute(_reserved);
+		if (listener != null)
+			listener.onTaskCompleted(JSONParser.networkJsonDecode(response));
 	}
 }

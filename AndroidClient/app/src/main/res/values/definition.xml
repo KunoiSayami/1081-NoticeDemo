@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="msg_token_fmt">Token: %s</string>
+    <string name="request_fmt">%s%s</string>
+
+    <!-- Json field name -->
+    <string name="server_address_field">server_address</string>
+    <string name="login_field">login</string>
+    <string name="token_field">token</string>
+    <string name="do_field">token</string>
+    <string name="refresh_field">refresh</string>
+    <string name="register_field">register</string>
+    <string name="logout_field">logout</string>
+    <string name="firebase_id_register_field">firebase_register</string>
+    <string name="verify_session_field">verify</string>
+    <!-- Json field name end -->
+
+    <string name="welcome_title_formatter">Welcome back! %s</string>
+    <string name="no_user_login_title">Click button to login.</string>
+    <string name="logout_text">Logout</string>
+
+    <string name="IntentFilter_login_success">loginSuccess</string>
+</resources>

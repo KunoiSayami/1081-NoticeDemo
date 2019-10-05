@@ -77,13 +77,13 @@
         android:id="@+id/cbRemember"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="44dp"
         android:checked="false"
         android:text="@string/text_remember_password"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.458"
+        app:layout_constraintHorizontal_bias="0.53"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtRepeatPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/textPassword" />
 
     <Button
         android:id="@+id/btGoRegister"
@@ -97,8 +97,8 @@
 
     <TextView
         android:id="@+id/txtRepeatPassword"
-        android:layout_width="82dp"
-        android:layout_height="55dp"
+        android:layout_width="108dp"
+        android:layout_height="23dp"
         android:layout_marginStart="32dp"
         android:layout_marginTop="44dp"
         android:text="@string/text_repeat_password"

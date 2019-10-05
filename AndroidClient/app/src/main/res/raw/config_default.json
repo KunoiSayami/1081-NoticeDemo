@@ -5,6 +5,9 @@
     "register": "register",
     "token": "token",
     "do": "update",
-    "refresh": "refresh"
+    "refresh": "refresh",
+    "firebase_register": "register_firebase",
+    "verify_session": "verify",
+    "logout": "logout"
   }
 }

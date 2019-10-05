@@ -48,7 +48,7 @@ class HttpRawResponse {
 
 	String getSessionString() {
 		try {
-			return options.get(0).toString();
+			return getOptions().get(0).toString();
 		}
 		catch (JSONException e){
 			e.printStackTrace();

@@ -65,7 +65,6 @@ class Server(BaseHTTPRequestHandler):
 		input_json = json.loads(self.rfile.read(length))
 
 		# add a property to the object, just to mess with data
-
 		status, options, errors = self.getJsonObject(input_json)
 
 		# send the message back

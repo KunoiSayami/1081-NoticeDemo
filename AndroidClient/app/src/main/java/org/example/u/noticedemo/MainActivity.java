@@ -41,14 +41,13 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
-import org.json.JSONObject;
-
 public class MainActivity extends AppCompatActivity {
 
 	static String TAG = "log_Main";
 	static DatabaseHelper databaseHelper;
 	static String user_auth = "";
 	static String firebase_id = "";
+	private View.OnClickListener changeToLoginActivityListener;
 
 	BroadcastReceiver accountEventReceiver;
 	TextView txtUserTitle;
@@ -59,8 +58,18 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		this.pre_init();
 		this.init();
-		this.change_activity();
+		//this.change_activity();
+	}
+
+	void pre_init() {
+		changeToLoginActivityListener = new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				change_activity();
+			}
+		};
 	}
 
 	void change_activity() {
@@ -71,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
 	void init(){
 		MainActivity.databaseHelper = new DatabaseHelper(this);
 		user_auth = databaseHelper.getSessionString();
+		final String user = databaseHelper.getStoredUser()[0];
 		NetworkPath.loadConfig(MainActivity.this);
 
 		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -99,6 +109,19 @@ public class MainActivity extends AppCompatActivity {
 				});
 		HelpMessageSupport.init_strings(MainActivity.this);
 
+		btnLoginout.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (MainActivity.user_auth.equals("")) {
+					Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+					startActivity(intent);
+				}
+				else {
+					setLogoutListener();
+				}
+			}
+		});
+
 		// https://stackoverflow.com/a/19026743
 		accountEventReceiver = new BroadcastReceiver() {
 			@Override
@@ -108,29 +131,50 @@ public class MainActivity extends AppCompatActivity {
 				btnLoginout.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						NetworkSupportBase l = new NetworkSupportBase(MainActivity.this, null,
-								NetworkRequestType.generateLogoutParams(user_auth), NetworkPath.logout_path,
-								new OnTaskCompleted() {
-									@Override
-									public void onTaskCompleted(Object o) {
-										txtUserTitle.setText(R.string.no_user_login_title);
-										btnLoginout.setText(R.string.text_login);
-										btnLoginout.setOnClickListener(new View.OnClickListener() {
-											@Override
-											public void onClick(View v) {
-												Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-												startActivity(intent);
-											}
-										});
-									}
-								});
-						l.execute();
+						setLogoutListener();
 					}
 				});
 			}
 		};
 		LocalBroadcastManager.getInstance(this).registerReceiver(accountEventReceiver,
 				new IntentFilter(getString(R.string.IntentFilter_login_success)));
+
+		if (user_auth.length() > 0) {
+			new NetworkSupportBase(MainActivity.this, null,
+					NetworkRequestType.generateVerifyParams(user, user_auth),
+					NetworkPath.verify_session_path,
+					new OnTaskCompleted() {
+						@Override
+						public void onTaskCompleted(Object o) {
+							HttpRawResponse h = (HttpRawResponse) o;
+							if (h.getStatus() == 200) {
+								txtUserTitle.setText(String.format(getString(R.string.welcome_title_formatter), user));
+								btnLoginout.setText(R.string.logout_text);
+								btnLoginout.setOnClickListener(changeToLoginActivityListener);
+							}
+						}
+					}).execute();
+		}
+	}
+
+	void setLogoutListener() {
+		NetworkSupportBase l = new NetworkSupportBase(MainActivity.this, null,
+				NetworkRequestType.generateLogoutParams(user_auth), NetworkPath.logout_path,
+				new OnTaskCompleted() {
+					@Override
+					public void onTaskCompleted(Object o) {
+						txtUserTitle.setText(R.string.no_user_login_title);
+						btnLoginout.setText(R.string.text_login);
+						btnLoginout.setOnClickListener(new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+								startActivity(intent);
+							}
+						});
+					}
+				});
+		l.execute();
 	}
 
 	static void reportFirebaseId(Context context, String firebaseID) {
@@ -146,8 +190,6 @@ public class MainActivity extends AppCompatActivity {
 
 	@Override
 	protected void onDestroy() {
-		//CheckBox cbRemember = findViewById(R.id.cbRemember);
-		//MainActivity.databaseHelper.setRememberedPassword(cbRemember.isChecked());
 		MainActivity.databaseHelper.close();
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(accountEventReceiver);
 		super.onDestroy();

@@ -36,7 +36,18 @@ class Server(_exServer):
 		if b:
 			Server.conn.execute("UPDATE `accounts` SET `last_login` = CURRENT_TIMESTAMP() WHERE `username` = %s", user)
 
+	def verify_user_session(self):
+		if self.headers.get('A-auth') is None:
+			return False, generate_dict.ERROR_USER_SESSION_MISSING(), None
+		sqlObj = Server.conn.execute("SELECT `user_id` FROM `user_session` WHERE `session` = %s", self.headers.get('A-auth'))
+		if sqlObj is None:
+			return False, generate_dict.ERROR_USER_SESSION_INVALID(), None
+		if (datetime.datetime.now() - sqlObj['timestamp']).total_seconds() > expire_day:
+			return False, generate_dict.ERROR_USER_SESSION_EXPIRED(), sqlObj
+		return True, generate_dict.SUCCESS_VERIFY_SESSION(), sqlObj
+
 	def getJsonObject(self, input_json: dict):
+		A_auth = self.headers.get('A-auth')
 		if self.path == '/login':
 			sqlObj = Server.conn.query1("SELECT * FROM `accounts` WHERE `username` = %s", input_json['user'])
 			if sqlObj is None:
@@ -48,7 +59,9 @@ class Server(_exServer):
 					return generate_dict.ERROR_INVALID_PASSWORD_OR_USER()
 				else:
 					self.log_login_attmept(input_json['user'], True)
-					return generate_dict.SUCCESS_LOGIN(self.generate_new_session_str(input_json['user']))
+					session = self.generate_new_session_str(input_json['user'])
+					Server.conn.execute("INSERT INTO `user_session` (`session`, `user_id`) VALUE (%s, %s)", (session, sqlObj['id']))
+					return generate_dict.SUCCESS_LOGIN(session)
 		elif self.path == '/register':
 			if len(input_json['user']) > 16:
 				return generate_dict.ERROR_USERNAME_TOO_LONG()
@@ -60,11 +73,8 @@ class Server(_exServer):
 			else:
 				return generate_dict.ERROR_USERNAME_ALREADY_EXIST()
 		elif self.path == '/register_firebase':
-			sqlObj = Server.conn.execute("SELECT `user_id` FROM `user_session` WHERE `session` = %s", self.headers.get('auth'))
-			if sqlObj is None:
-				return generate_dict.ERROR_USER_SESSION_INVALID()
-			if (datetime.datetime.now() - sqlObj['timestamp']).total_seconds() > expire_day:
-				return generate_dict.ERROR_USER_SESSION_EXPIRED()
+			r, rt_value, sqlObj = self.verify_user_session()
+			if r: return rt_value
 			sqlObj1 = Server.conn.query1("SELECT `user_id` FROM `firebasetoken` WHERE `token` = %s", input_json['token'])
 			if sqlObj1 is None:
 				Server.conn.execute("INSERT INTO `firebasetoken` (`user_id`, `token`) VALUE (%s, %s)", (sqlObj['user_id'], input_json['token']))
@@ -73,6 +83,14 @@ class Server(_exServer):
 			else:
 				Server.conn.execute("UPDATE `firebasetoken` SET `register_date` = CURRENT_TIMESTAMP() WHERE `token` = %s", input_json['token'])
 			return generate_dict.SUCCESS_REGISTER_FIREBASE_ID()
+		elif self.path == '/verify':
+			_r, rt_value, _ = self.verify_user_session()
+			return rt_value
+		elif self.path == '/logout':
+			if A_auth is None:
+				return generate_dict.ERROR_USER_SESSION_MISSING()
+			Server.conn.execute("DELETE FROM `user_session` WHERE `session` = %s", A_auth)
+			return generate_dict.SUCCESS_LOGOUT()
 
 	def generate_new_session_str(self, user_name: str):
 		return ''.join(x.hexdigest() for x in map(
@@ -82,6 +100,12 @@ class Server(_exServer):
 				os.urandom(16),
 				user_name.encode()
 			]))
+
+	def get_userid_from_username(self, user_name: str):
+		sqlObj = Server.conn.query1("SELECT `id` FROM `accounts` WHERE `username` = %s AND `enabled` = 'Y'", user_name)
+		if sqlObj is not None:
+			return sqlObj['id']
+		return None
 
 class appServer:
 	def __init__(self):
@@ -102,6 +126,7 @@ class appServer:
 			Server)
 
 	def run(self):
+		self.mysql_conn.do_keepalive()
 		self.server_handle.serve_forever()
 
 	def close(self):

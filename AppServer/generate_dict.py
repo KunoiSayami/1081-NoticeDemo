@@ -5,7 +5,7 @@ def SUCCESS_200OK():
     return (200, [], generate_error_dict(0, ''))
 
 def SUCCESS_LOGIN(session_string: str):
-    return (200, [session_string], generate_error_dict(0, ''))
+    return (200, [session_string,], generate_error_dict(0, ''))
 
 def SUCCESS_REGISTER():
     return SUCCESS_200OK()
@@ -29,4 +29,10 @@ def SUCCESS_REGISTER_FIREBASE_ID():
     return SUCCESS_200OK()
 
 def SUCCESS_VERIFY_SESSION():
+    return SUCCESS_200OK()
+
+def ERROR_USER_SESSION_MISSING():
+    return (400, [], generate_error_dict(6, 'Session string missing'))
+
+def SUCCESS_LOGOUT():
     return SUCCESS_200OK()

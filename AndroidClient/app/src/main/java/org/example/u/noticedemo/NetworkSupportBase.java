@@ -55,7 +55,7 @@ class NetworkSupportBase extends AsyncTask<URL, Integer, Long> {
 	private OnTaskCompleted listener = null;
 
 	NetworkSupportBase(Context context,
-					   String _reversed,
+					   Object _reversed,
 					   NetworkRequestType _networkRequestType,
 					   String request_path,
 					   OnTaskCompleted _listener)

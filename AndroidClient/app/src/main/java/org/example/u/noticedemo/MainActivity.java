@@ -23,7 +23,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.Network;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
@@ -45,9 +44,9 @@ public class MainActivity extends AppCompatActivity {
 
 	static String TAG = "log_Main";
 	static DatabaseHelper databaseHelper;
-	static String user_auth = "";
-	static String firebase_id = "";
-	private View.OnClickListener changeToLoginActivityListener;
+	private View.OnClickListener changeToLoginActivityListener, changeToLogoutListener;
+
+	static SessionManage userSession;
 
 	BroadcastReceiver accountEventReceiver;
 	TextView txtUserTitle;
@@ -70,6 +69,13 @@ public class MainActivity extends AppCompatActivity {
 				change_activity();
 			}
 		};
+
+		changeToLogoutListener = new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				setLogoutListener();
+			}
+		};
 	}
 
 	void change_activity() {
@@ -79,12 +85,14 @@ public class MainActivity extends AppCompatActivity {
 
 	void init(){
 		MainActivity.databaseHelper = new DatabaseHelper(this);
-		user_auth = databaseHelper.getSessionString();
-		final String user = databaseHelper.getStoredUser()[0];
+		userSession = new SessionManage("", databaseHelper);
+		Log.d(TAG, "init: user_session_string => " + userSession.getUserSession().length());
 		NetworkPath.loadConfig(MainActivity.this);
 
 		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 		StrictMode.setThreadPolicy(policy);
+
+		HelpMessageSupport.init_strings(MainActivity.this);
 
 		txtUserTitle = findViewById(R.id.txtUserTitle);
 		btnLoginout = findViewById(R.id.btnLoginout);
@@ -107,12 +115,11 @@ public class MainActivity extends AppCompatActivity {
 						Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
 					}
 				});
-		HelpMessageSupport.init_strings(MainActivity.this);
 
 		btnLoginout.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (MainActivity.user_auth.equals("")) {
+				if (MainActivity.userSession.getUserSession().equals("")) {
 					Intent intent = new Intent(MainActivity.this, LoginActivity.class);
 					startActivity(intent);
 				}
@@ -126,30 +133,30 @@ public class MainActivity extends AppCompatActivity {
 		accountEventReceiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
-				txtUserTitle.setText(String.format(getString(R.string.welcome_title_formatter), "test"));
+				txtUserTitle.setText(String.format(getString(R.string.welcome_title_formatter), databaseHelper.getLoginedUser()));
 				btnLoginout.setText(R.string.logout_text);
-				btnLoginout.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						setLogoutListener();
-					}
-				});
+				btnLoginout.setOnClickListener(changeToLogoutListener);
 			}
 		};
 		LocalBroadcastManager.getInstance(this).registerReceiver(accountEventReceiver,
 				new IntentFilter(getString(R.string.IntentFilter_login_success)));
 
-		if (user_auth.length() > 0) {
+		if (userSession.getUserSession().length() > 0) {
 			new NetworkSupportBase(MainActivity.this, null,
-					NetworkRequestType.generateVerifyParams(user, user_auth),
+					userSession.getRequestParams(),
 					NetworkPath.verify_session_path,
 					new OnTaskCompleted() {
 						@Override
 						public void onTaskCompleted(Object o) {
 							HttpRawResponse h = (HttpRawResponse) o;
 							if (h.getStatus() == 200) {
-								txtUserTitle.setText(String.format(getString(R.string.welcome_title_formatter), user));
+								txtUserTitle.setText(String.format(getString(R.string.welcome_title_formatter), userSession.getUserName()));
 								btnLoginout.setText(R.string.logout_text);
+								btnLoginout.setOnClickListener(changeToLogoutListener);
+							}
+							else {
+								txtUserTitle.setText(R.string.no_user_login_title);
+								btnLoginout.setText(R.string.text_login);
 								btnLoginout.setOnClickListener(changeToLoginActivityListener);
 							}
 						}
@@ -159,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
 
 	void setLogoutListener() {
 		NetworkSupportBase l = new NetworkSupportBase(MainActivity.this, null,
-				NetworkRequestType.generateLogoutParams(user_auth), NetworkPath.logout_path,
+				NetworkRequestType.generateLogoutParams(userSession.getUserSession()), NetworkPath.logout_path,
 				new OnTaskCompleted() {
 					@Override
 					public void onTaskCompleted(Object o) {
@@ -178,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	static void reportFirebaseId(Context context, String firebaseID) {
-		firebase_id = firebaseID;
+		userSession.setFirebaseID(firebaseID);
 		try {
 			FirebaseNetworkSupport firebaseNetworkSupport = new FirebaseNetworkSupport(context, firebaseID);
 			firebaseNetworkSupport.execute();

@@ -19,17 +19,63 @@
  */
 package org.example.u.noticedemo;
 
+import androidx.annotation.NonNull;
+
 public class SessionManage {
-	String firebaseID;
-	SessionManage(String _firebaseID){
-		firebaseID = _firebaseID;
+	private String firebaseID;
+	private String userName;
+	private String userSession;
+
+
+	SessionManage(String _firebaseID, String _user_name, String _user_session){
+		setFirebaseID(_firebaseID);
+		setUserName(_user_name);
+		setUserSession(_user_session);
 	}
+
+	SessionManage(String _firebaseID, DatabaseHelper db) {
+		setFirebaseID(_firebaseID);
+		getFromDatabase(db);
+	}
+
+	String getUserName() {
+		return userName;
+	}
+
 	String getFirebaseID() {
 		return firebaseID;
 	}
+
+	String getUserSession() {
+		return userSession;
+	}
+
+	void getFromHttpRawResponse(HttpRawResponse hrr) {
+		setUserName(hrr.getSessionUser());
+		setUserSession(hrr.getSessionString());
+	}
+
+	void setUserName(String _userName) {
+		userName = _userName;
+	}
+
+	void setUserSession(String _userSession) {
+		userSession = _userSession;
+	}
+
+	void getFromDatabase(@NonNull DatabaseHelper db) {
+		userName = db.getLoginedUser();
+		userSession = db.getSessionString();
+	}
+
 
 	String setFirebaseID(String newFirebaseID) {
 		firebaseID = newFirebaseID;
 		return firebaseID;
 	}
+
+	NetworkRequestType getRequestParams() {
+		return NetworkRequestType.generateVerifyParams(getUserName(), getUserSession());
+	}
+
 }

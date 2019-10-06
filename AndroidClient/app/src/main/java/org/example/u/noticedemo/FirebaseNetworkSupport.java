@@ -25,7 +25,7 @@ class FirebaseNetworkSupport extends NetworkSupportBase {
 	FirebaseNetworkSupport(Context context, String firebase_id) {
 		super(context, null, NetworkRequestType.generateRegisterFirebaseIDParams(
 				firebase_id,
-				MainActivity.user_auth
+				MainActivity.userSession.getUserSession()
 		), NetworkPath.firebase_id_register_path, null);
 	}
 }

@@ -90,7 +90,7 @@ public class NetworkRequestType {
 
 	static NetworkRequestType generateRegisterFirebaseIDParams(String firebaseID, String sessionStr){
 		HashMap<String, String> params = new HashMap<>();
-		params.put("firebaseID", firebaseID);
+		params.put("token", firebaseID);
 		HashMap<String, String> _headers = new HashMap<>();
 		_headers.put("A-auth", sessionStr);
 		return new NetworkRequestType(enumMajorType.FIREBASE, enumMinorType.FIREBASE.REGISTER, params, _headers);

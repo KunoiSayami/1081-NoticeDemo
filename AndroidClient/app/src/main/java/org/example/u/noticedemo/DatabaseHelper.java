@@ -59,9 +59,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	}
 
 	boolean isRememberedPassword() {
-		String sql = "SELECT * FROM `Option` WHERE `name` = \"remember_password\"";
+		String sql = "SELECT * FROM `Option` WHERE `name` = ?";
 		SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
-		Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
+		Cursor cursor = sqLiteDatabase.rawQuery(sql, new String[]{"remember_password"});
 		cursor.moveToFirst();
 		// https://stackoverflow.com/a/4088131
 		boolean remember_password = cursor.getString(cursor.getColumnIndexOrThrow("value")).equals("true");
@@ -73,8 +73,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues contentValues = new ContentValues();
 		contentValues.put("value", b? "true": "false");
-		db.update(TABLE_OPTION, contentValues, "name = ?", new String[]{"value"});
+		db.update(TABLE_OPTION, contentValues, "name = ?", new String[]{"remember_password"});
 		db.close();
+	}
+
+	void setLoginedUser(String user) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		ContentValues ct = new ContentValues();
+		ct.put("value", user);
+		db.update(TABLE_OPTION, ct, "name = ?", new String[]{"user_name"});
+		db.close();
+	}
+
+	String getLoginedUser() {
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor cursor = db.rawQuery("SELECT `value` FROM `Option` WHERE `name` = ?", new String[]{"user_name"});
+		cursor.moveToFirst();
+		String username = cursor.getString(cursor.getColumnIndexOrThrow("value"));
+		cursor.close();
+		return username;
 	}
 
 	void setSessionString(String sessionString) {

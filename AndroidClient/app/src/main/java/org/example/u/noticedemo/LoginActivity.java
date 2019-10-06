@@ -320,19 +320,20 @@ public class LoginActivity extends AppCompatActivity{
 
 	void login_callback(HttpRawResponse httpRawResponse) {
 		if (httpRawResponse.getStatus() == 200) {
-			MainActivity.user_auth = httpRawResponse.getSessionString();
-			MainActivity.databaseHelper.setSessionString(MainActivity.user_auth);
-			MainActivity.reportFirebaseId(LoginActivity.this, MainActivity.firebase_id);
+			MainActivity.userSession.getFromHttpRawResponse(httpRawResponse);
+			MainActivity.databaseHelper.setSessionString(httpRawResponse.getSessionString());
+			MainActivity.databaseHelper.setLoginedUser(httpRawResponse.getSessionUser());
+			MainActivity.reportFirebaseId(LoginActivity.this, MainActivity.userSession.getFirebaseID());
 			Toast.makeText(this, "Login success", Toast.LENGTH_SHORT).show();
 			if (cbRemember.isChecked()) {
 				MainActivity.databaseHelper.updateUser(this.getUser(), this.getPassword());
 			}
-			else {
-				// ERROR PROCESS GOES HERE
-			}
+			MainActivity.databaseHelper.setRememberedPassword(cbRemember.isChecked());
+			LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(getString(R.string.IntentFilter_login_success)));
+			finish();
 		}
-		MainActivity.databaseHelper.setRememberedPassword(cbRemember.isChecked());
-		LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(getString(R.string.IntentFilter_login_success)));
-		finish();
+		else {
+			Toast.makeText(this, "Login error. " + httpRawResponse.getErrorString(), Toast.LENGTH_SHORT).show();
+		}
 	}
 }

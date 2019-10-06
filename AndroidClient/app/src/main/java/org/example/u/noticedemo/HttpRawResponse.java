@@ -23,8 +23,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
 class HttpRawResponse {
+	final int user_name_offset = 0;
+	final int user_session_offset = 1;
+
 	private int status;
 	private JSONArray options;
 	private JSONObject errors;
@@ -46,9 +48,37 @@ class HttpRawResponse {
 		return errors;
 	}
 
+	int getLastError() {
+		try {
+			return errors.getInt("code");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return -1;
+	}
+
+	String getErrorString() {
+		try {
+			return errors.getString("info");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return "JSONException";
+	}
+
+	String getSessionUser() {
+		try {
+			return getOptions().get(user_name_offset).toString();
+		}
+		catch (JSONException e){
+			e.printStackTrace();
+		}
+		return "ERROR";
+	}
+
 	String getSessionString() {
 		try {
-			return getOptions().get(0).toString();
+			return getOptions().get(user_session_offset).toString();
 		}
 		catch (JSONException e){
 			e.printStackTrace();

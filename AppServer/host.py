@@ -36,10 +36,10 @@ class Server(_exServer):
 		if b:
 			Server.conn.execute("UPDATE `accounts` SET `last_login` = CURRENT_TIMESTAMP() WHERE `username` = %s", user)
 
-	def verify_user_session(self):
-		if self.headers.get('A-auth') is None:
+	def verify_user_session(self, A_auth: str):
+		if A_auth is None:
 			return False, generate_dict.ERROR_USER_SESSION_MISSING(), None
-		sqlObj = Server.conn.execute("SELECT `user_id` FROM `user_session` WHERE `session` = %s", self.headers.get('A-auth'))
+		sqlObj = Server.conn.query1("SELECT `user_id`, `timestamp` FROM `user_session` WHERE `session` = %s", A_auth)
 		if sqlObj is None:
 			return False, generate_dict.ERROR_USER_SESSION_INVALID(), None
 		if (datetime.datetime.now() - sqlObj['timestamp']).total_seconds() > expire_day:
@@ -61,7 +61,7 @@ class Server(_exServer):
 					self.log_login_attmept(input_json['user'], True)
 					session = self.generate_new_session_str(input_json['user'])
 					Server.conn.execute("INSERT INTO `user_session` (`session`, `user_id`) VALUE (%s, %s)", (session, sqlObj['id']))
-					return generate_dict.SUCCESS_LOGIN(session)
+					return generate_dict.SUCCESS_LOGIN(input_json['user'], session)
 		elif self.path == '/register':
 			if len(input_json['user']) > 16:
 				return generate_dict.ERROR_USERNAME_TOO_LONG()
@@ -73,8 +73,8 @@ class Server(_exServer):
 			else:
 				return generate_dict.ERROR_USERNAME_ALREADY_EXIST()
 		elif self.path == '/register_firebase':
-			r, rt_value, sqlObj = self.verify_user_session()
-			if r: return rt_value
+			r, rt_value, sqlObj = self.verify_user_session(A_auth)
+			if not r: return rt_value
 			sqlObj1 = Server.conn.query1("SELECT `user_id` FROM `firebasetoken` WHERE `token` = %s", input_json['token'])
 			if sqlObj1 is None:
 				Server.conn.execute("INSERT INTO `firebasetoken` (`user_id`, `token`) VALUE (%s, %s)", (sqlObj['user_id'], input_json['token']))
@@ -84,13 +84,14 @@ class Server(_exServer):
 				Server.conn.execute("UPDATE `firebasetoken` SET `register_date` = CURRENT_TIMESTAMP() WHERE `token` = %s", input_json['token'])
 			return generate_dict.SUCCESS_REGISTER_FIREBASE_ID()
 		elif self.path == '/verify':
-			_r, rt_value, _ = self.verify_user_session()
+			_r, rt_value, _ = self.verify_user_session(A_auth)
 			return rt_value
 		elif self.path == '/logout':
 			if A_auth is None:
 				return generate_dict.ERROR_USER_SESSION_MISSING()
 			Server.conn.execute("DELETE FROM `user_session` WHERE `session` = %s", A_auth)
 			return generate_dict.SUCCESS_LOGOUT()
+		return generate_dict.ERROR_INVALID_REQUEST()
 
 	def generate_new_session_str(self, user_name: str):
 		return ''.join(x.hexdigest() for x in map(

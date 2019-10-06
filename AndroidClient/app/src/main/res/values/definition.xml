@@ -12,7 +12,7 @@
     <string name="register_field">register</string>
     <string name="logout_field">logout</string>
     <string name="firebase_id_register_field">firebase_register</string>
-    <string name="verify_session_field">verify</string>
+    <string name="verify_session_field">verify_session</string>
     <!-- Json field name end -->
 
     <string name="welcome_title_formatter">Welcome back! %s</string>

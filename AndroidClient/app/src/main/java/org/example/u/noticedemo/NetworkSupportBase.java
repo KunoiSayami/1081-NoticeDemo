@@ -21,6 +21,7 @@ package org.example.u.noticedemo;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -67,6 +68,7 @@ class NetworkSupportBase extends AsyncTask<URL, Integer, Long> {
 		headerParams = _networkRequestType.getHeaders();
 		requestPath = request_path;
 		listener = _listener;
+		Log.d(TAG, "NetworkSupportBase: Request to " + requestPath);
 	}
 
 	private

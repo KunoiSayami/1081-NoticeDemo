@@ -4,8 +4,8 @@ def generate_error_dict(code: int, info: str):
 def SUCCESS_200OK():
     return (200, [], generate_error_dict(0, ''))
 
-def SUCCESS_LOGIN(session_string: str):
-    return (200, [session_string,], generate_error_dict(0, ''))
+def SUCCESS_LOGIN(user_name: str, session_string: str):
+    return (200, [user_name, session_string,], generate_error_dict(0, ''))
 
 def SUCCESS_REGISTER():
     return SUCCESS_200OK()
@@ -36,3 +36,6 @@ def ERROR_USER_SESSION_MISSING():
 
 def SUCCESS_LOGOUT():
     return SUCCESS_200OK()
+
+def ERROR_INVALID_REQUEST():
+    return (403, [], generate_error_dict(7, 'Invalid request'))

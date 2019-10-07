@@ -15,3 +15,13 @@
 		die();
 	}
 ?>
+
+<html>
+	<h1>Send message to All device</h1>
+	<form>
+		<input type="text" name="title">
+		<input type="text" name="detail">
+		<input type="submit">
+	</form>
+	Click <a href = "/login.php?action=logout">here</a> to logout Session.
+</html>

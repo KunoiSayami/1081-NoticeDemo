@@ -71,23 +71,27 @@
 
    <body>
 
-		<h2>Login</h2>
+		<h2>Login required</h2>
 		<div class = "container form-signin">
 			<?php
 				$msg = '';
 				if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 					$conn = mysqli_connect($DB_HOST, $DB_USER, $DB_PASSWORD, $DB_NAME, $DB_PORT);
 					$success_login = false;
+					/*if (!$conn) {
+						die("Connection failed: " . mysqli_connect_error());
+					}*/
 					if (isset($_POST['login']) && !empty($_POST['username'])
-					&& !empty($_POST['password'])) {
+						&& !empty($_POST['password'])) {
 						$hash_passwd = hash('sha512', $_POST['password']);
-						$username = mysqli_escape_string($_POST['username']);
+						$username = mysqli_escape_string($conn, $_POST['username']);
 						$sqlObj = mysqli_query($conn,
-							"SELECT `id` FROM `manage_account` WHERE `user_name` = $username");
+							"SELECT `id`, `password` FROM `manage_account` WHERE `username` = '$username';");
 						if (mysqli_num_rows($sqlObj) > 0) {
 							// Only one row will get
 							$row = mysqli_fetch_assoc($sqlObj);
-							if ($row['password'] == $hash_passwd) {
+							echo $row['password'];
+							if ($row['password'] === $hash_passwd) {
 								$success_login = true;
 								$_SESSION['timeout'] = time();
 								$_SESSION['user_id'] = $row['id'];
@@ -96,6 +100,7 @@
 					}
 					if ($success_login) {
 						$_SESSION['valid'] = true;
+						header("Location: /", true, 301);
 					}
 					else {
 						$msg = 'Wrong username or password';
@@ -125,13 +130,13 @@
 				<input type = "text" class = "form-control"
 				name = "username" placeholder = "Username"
 				required autofocus></br>
-				<input type = "password" class = "form-control"
+				<input type = "current-password" class = "form-control"
 				name = "password" placeholder = "password" required>
+				<br>
 				<button class = "btn btn-lg btn-primary btn-block" type = "submit"
 				name = "login">Login</button>
 				</form>
 
-			Click here to clean <a href = "<?php echo htmlspecialchars($_SERVER['PHP_SELF']);?>?action=logout" tite = "Logout">Session.
 
 		</div>
 

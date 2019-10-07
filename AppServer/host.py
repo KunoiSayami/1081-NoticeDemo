@@ -48,6 +48,8 @@ class Server(_exServer):
 
 	def getJsonObject(self, input_json: dict):
 		A_auth = self.headers.get('A-auth')
+
+		# Process user login
 		if self.path == '/login':
 			sqlObj = Server.conn.query1("SELECT * FROM `accounts` WHERE `username` = %s", input_json['user'])
 			if sqlObj is None:
@@ -62,6 +64,8 @@ class Server(_exServer):
 					session = self.generate_new_session_str(input_json['user'])
 					Server.conn.execute("INSERT INTO `user_session` (`session`, `user_id`) VALUE (%s, %s)", (session, sqlObj['id']))
 					return generate_dict.SUCCESS_LOGIN(input_json['user'], session)
+
+		# Process register user
 		elif self.path == '/register':
 			if len(input_json['user']) > 16:
 				return generate_dict.ERROR_USERNAME_TOO_LONG()
@@ -72,6 +76,8 @@ class Server(_exServer):
 				return generate_dict.SUCCESS_REGISTER()
 			else:
 				return generate_dict.ERROR_USERNAME_ALREADY_EXIST()
+
+		# Process register firebase ID
 		elif self.path == '/register_firebase':
 			r, rt_value, sqlObj = self.verify_user_session(A_auth)
 			if not r: return rt_value
@@ -83,15 +89,25 @@ class Server(_exServer):
 			else:
 				Server.conn.execute("UPDATE `firebasetoken` SET `register_date` = CURRENT_TIMESTAMP() WHERE `token` = %s", input_json['token'])
 			return generate_dict.SUCCESS_REGISTER_FIREBASE_ID()
+		
+
+		# Process verify user session string
 		elif self.path == '/verify':
 			_r, rt_value, _ = self.verify_user_session(A_auth)
 			return rt_value
+		
+		# Process user logout
 		elif self.path == '/logout':
 			if A_auth is None:
 				return generate_dict.ERROR_USER_SESSION_MISSING()
 			Server.conn.execute("DELETE FROM `user_session` WHERE `session` = %s", A_auth)
 			return generate_dict.SUCCESS_LOGOUT()
+
 		return generate_dict.ERROR_INVALID_REQUEST()
+
+
+	def handle_manage_request(self):
+		pass
 
 	def generate_new_session_str(self, user_name: str):
 		return ''.join(x.hexdigest() for x in map(

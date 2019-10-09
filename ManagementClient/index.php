@@ -46,8 +46,8 @@
 			</div>
 
 			<div id="firebase_control_button">
-				<button type="firebase_send">send</button>
-				<button type="firebase_form_reset">reset</button>
+				<button type="submit" id="firebase_send">send</button>
+				<button id="firebase_form_reset">reset</button>
 				<button id="firebase_from_refresh">refresh</button>
 			</div>
 		</form>

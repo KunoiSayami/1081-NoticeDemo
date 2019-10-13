@@ -84,18 +84,22 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	void init(){
+		txtUserTitle = findViewById(R.id.txtUserTitle);
+		btnLoginout = findViewById(R.id.btnLoginout);
 		MainActivity.databaseHelper = new DatabaseHelper(this);
 		userSession = new SessionManage("", databaseHelper);
-		Log.d(TAG, "init: user_session_string => " + userSession.getUserSession().length());
+
+		// Tell user to wait checking session availability
+		if (userSession.getUserSession().length() > 0) {
+			txtUserTitle.setText(R.string.text_wait);
+		}
+
 		NetworkPath.loadConfig(MainActivity.this);
 
 		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 		StrictMode.setThreadPolicy(policy);
 
 		HelpMessageSupport.init_strings(MainActivity.this);
-
-		txtUserTitle = findViewById(R.id.txtUserTitle);
-		btnLoginout = findViewById(R.id.btnLoginout);
 
 		FirebaseInstanceId.getInstance().getInstanceId()
 				.addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
@@ -112,9 +116,12 @@ public class MainActivity extends AppCompatActivity {
 						// Log and toast
 						String msg = getString(R.string.msg_token_fmt, token);
 						Log.d(TAG, msg);
-						Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+						//Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
 					}
 				});
+
+		if (userSession.getUserSession().length() > 0)
+			Toast.makeText(MainActivity.this, R.string.text_checking_login_status, Toast.LENGTH_SHORT).show();
 
 		btnLoginout.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -128,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
 				}
 			}
 		});
+		btnLoginout.setEnabled(false);
 
 		// https://stackoverflow.com/a/19026743
 		accountEventReceiver = new BroadcastReceiver() {
@@ -159,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
 								btnLoginout.setText(R.string.text_login);
 								btnLoginout.setOnClickListener(changeToLoginActivityListener);
 							}
+							btnLoginout.setEnabled(true);
 						}
 					}).execute();
 		}

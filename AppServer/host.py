@@ -42,6 +42,8 @@ class Server(_exServer):
 		sqlObj = Server.conn.query1("SELECT `user_id`, `timestamp` FROM `user_session` WHERE `session` = %s", A_auth)
 		if sqlObj is None:
 			return False, generate_dict.ERROR_USER_SESSION_INVALID(), None
+		# Update session timestamp if session still in use
+		Server.conn.execute("UPDATE `user_session` SET `timestamp` = CURRENT_TIMESTAMP() WHERE `session` = %s", A_auth)
 		if (datetime.datetime.now() - sqlObj['timestamp']).total_seconds() > expire_day:
 			return False, generate_dict.ERROR_USER_SESSION_EXPIRED(), sqlObj
 		return True, generate_dict.SUCCESS_VERIFY_SESSION(), sqlObj

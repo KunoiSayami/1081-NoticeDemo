@@ -33,6 +33,7 @@ def build_status_json(status: int, options: list, errors: dict):
 class Server(BaseHTTPRequestHandler):
 
 	conn = None
+	mdict = {}
 
 	def _set_headers(self):
 		self.send_response(200)

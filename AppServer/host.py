@@ -26,7 +26,7 @@ from libpy3.mysqldb import mysqldb
 from configparser import ConfigParser
 from http.server import HTTPServer
 from server import Server as _exServer
-import generate_dict
+from http_status_code import HTTP_STATUS_CODES
 
 expire_day = 2 * 60 * 60 * 24
 
@@ -38,15 +38,15 @@ class Server(_exServer):
 
 	def verify_user_session(self, A_auth: str):
 		if A_auth is None:
-			return False, generate_dict.ERROR_USER_SESSION_MISSING(), None
+			return False, HTTP_STATUS_CODES.ERROR_USER_SESSION_MISSING, None
 		sqlObj = Server.conn.query1("SELECT `user_id`, `timestamp` FROM `user_session` WHERE `session` = %s", A_auth)
 		if sqlObj is None:
-			return False, generate_dict.ERROR_USER_SESSION_INVALID(), None
+			return False, HTTP_STATUS_CODES.ERROR_USER_SESSION_INVALID, None
 		# Update session timestamp if session still in use
 		Server.conn.execute("UPDATE `user_session` SET `timestamp` = CURRENT_TIMESTAMP() WHERE `session` = %s", A_auth)
 		if (datetime.datetime.now() - sqlObj['timestamp']).total_seconds() > expire_day:
-			return False, generate_dict.ERROR_USER_SESSION_EXPIRED(), sqlObj
-		return True, generate_dict.SUCCESS_VERIFY_SESSION(), sqlObj
+			return False, HTTP_STATUS_CODES.ERROR_USER_SESSION_EXPIRED, sqlObj
+		return True, HTTP_STATUS_CODES.SUCCESS_VERIFY_SESSION, sqlObj
 
 	def getJsonObject(self, input_json: dict):
 		A_auth = self.headers.get('A-auth')
@@ -56,28 +56,28 @@ class Server(_exServer):
 			sqlObj = Server.conn.query1("SELECT * FROM `accounts` WHERE `username` = %s", input_json['user'])
 			if sqlObj is None:
 				self.log_login_attmept(input_json['user'], False)
-				return generate_dict.ERROR_INVALID_PASSWORD_OR_USER()
+				return HTTP_STATUS_CODES.ERROR_INVALID_PASSWORD_OR_USER
 			else:
 				if sqlObj['password'] != input_json['password']:
 					self.log_login_attmept(input_json['user'], False)
-					return generate_dict.ERROR_INVALID_PASSWORD_OR_USER()
+					return HTTP_STATUS_CODES.ERROR_INVALID_PASSWORD_OR_USER
 				else:
 					self.log_login_attmept(input_json['user'], True)
 					session = self.generate_new_session_str(input_json['user'])
 					Server.conn.execute("INSERT INTO `user_session` (`session`, `user_id`) VALUE (%s, %s)", (session, sqlObj['id']))
-					return generate_dict.SUCCESS_LOGIN(input_json['user'], session)
+					return HTTP_STATUS_CODES.SUCCESS_LOGIN(input_json['user'], session)
 
 		# Process register user
 		elif self.path == '/register':
 			if len(input_json['user']) > 16:
-				return generate_dict.ERROR_USERNAME_TOO_LONG()
+				return HTTP_STATUS_CODES.ERROR_USERNAME_TOO_LONG
 			sqlObj = Server.conn.query1("SELECT * FROM `accounts` WHERE `username` = %s", input_json['user'])
 			if sqlObj is None:
 				Server.conn.execute("INSERT INTO `accounts` (`username`, `password`) VALUE (%s, %s)",
 					(input_json['user'], input_json['password']))
-				return generate_dict.SUCCESS_REGISTER()
+				return HTTP_STATUS_CODES.SUCCESS_REGISTER
 			else:
-				return generate_dict.ERROR_USERNAME_ALREADY_EXIST()
+				return HTTP_STATUS_CODES.ERROR_USERNAME_ALREADY_EXIST
 
 		# Process register firebase ID
 		elif self.path == '/register_firebase':
@@ -90,7 +90,7 @@ class Server(_exServer):
 				Server.conn.execute("UPDATE `firebasetoken` SET `user_id` = %s WHERE `token` = %s", (sqlObj['user_id'], input_json['token']))
 			else:
 				Server.conn.execute("UPDATE `firebasetoken` SET `register_date` = CURRENT_TIMESTAMP() WHERE `token` = %s", input_json['token'])
-			return generate_dict.SUCCESS_REGISTER_FIREBASE_ID()
+			return HTTP_STATUS_CODES.SUCCESS_REGISTER_FIREBASE_ID
 		
 
 		# Process verify user session string
@@ -101,17 +101,23 @@ class Server(_exServer):
 		# Process user logout
 		elif self.path == '/logout':
 			if A_auth is None:
-				return generate_dict.ERROR_USER_SESSION_MISSING()
+				return HTTP_STATUS_CODES.ERROR_USER_SESSION_MISSING
 			Server.conn.execute("DELETE FROM `user_session` WHERE `session` = %s", A_auth)
-			return generate_dict.SUCCESS_LOGOUT()
+			return HTTP_STATUS_CODES.SUCCESS_LOGOUT
 
-		return generate_dict.ERROR_INVALID_REQUEST()
+		elif self.path == '/admin':
+			return self.handle_manage_request(input_json)
+
+		return HTTP_STATUS_CODES.ERROR_INVALID_REQUEST
 
 
-	def handle_manage_request(self):
-		pass
+	def handle_manage_request(self, d: dict):
+		if self.headers.get('X-Real-IP') not in Server.mdict['trust_ip']:
+			return HTTP_STATUS_CODES.ERROR_403_FORBIDDEN
+		return HTTP_STATUS_CODES.ERROR_400_BAD_REQUEST
 
-	def generate_new_session_str(self, user_name: str):
+	@staticmethod
+	def generate_new_session_str(user_name: str):
 		return ''.join(x.hexdigest() for x in map(
 			hashlib.sha256, [
 				os.urandom(16),
@@ -139,7 +145,13 @@ class appServer:
 			autocommit=True
 		)
 
+		self.mdict = {}
+		if self.config.has_option('server', 'trust_ip'):
+			self.mdict['trust_ip'] = list(map(str, self.config['server']['trust_ip'].split(',')))
+
 		setattr(Server, 'conn', self.mysql_conn)
+		setattr(Server, 'mdict', self.mdict)
+
 		self.server_handle = HTTPServer(
 			(self.config['server']['address'], int(self.config['server']['port'])),
 			Server)

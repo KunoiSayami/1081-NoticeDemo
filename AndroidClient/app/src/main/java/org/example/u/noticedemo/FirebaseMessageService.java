@@ -27,7 +27,7 @@ import androidx.core.app.NotificationManagerCompat;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-public class MyFirebaseMessagingService extends FirebaseMessagingService {
+public class FirebaseMessageService extends FirebaseMessagingService {
 
 	String TAG = "log_MyFirebaseMessagingService";
 

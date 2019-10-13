@@ -29,7 +29,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -120,15 +119,14 @@ public class MainActivity extends AppCompatActivity {
 					}
 				});
 
-		if (userSession.getUserSession().length() > 0)
-			Toast.makeText(MainActivity.this, R.string.text_checking_login_status, Toast.LENGTH_SHORT).show();
+		/*if (userSession.getUserSession().length() > 0)
+			Toast.makeText(MainActivity.this, R.string.text_checking_login_status, Toast.LENGTH_SHORT).show();*/
 
 		btnLoginout.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if (MainActivity.userSession.getUserSession().equals("")) {
-					Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-					startActivity(intent);
+					change_activity();
 				}
 				else {
 					setLogoutListener();

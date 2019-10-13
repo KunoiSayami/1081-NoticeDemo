@@ -39,6 +39,8 @@ import java.util.Iterator;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import cz.ackee.useragent.UserAgent;
+
 import static org.example.u.noticedemo.NetworkPath.server_address;
 
 //https://stackoverflow.com/a/43146379
@@ -46,12 +48,12 @@ class NetworkSupportBase extends AsyncTask<URL, Integer, Long> {
 
 	private static final String TAG = "log_NetworkSupport";
 
-	String response = "";
+	private String response = "";
 
-	NetworkRequestType networkRequestType;
-	String requestPath;
+	private NetworkRequestType networkRequestType;
+	private String requestPath;
 	Context myContext;
-	HashMap<String, String> postParams, headerParams;
+	private HashMap<String, String> postParams, headerParams;
 
 	private OnTaskCompleted listener = null;
 
@@ -63,7 +65,7 @@ class NetworkSupportBase extends AsyncTask<URL, Integer, Long> {
 	{
 		myContext = context;
 		//GoesAddress = gowhere;
-		networkRequestType = _networkRequestType;
+		//networkRequestType = _networkRequestType;
 		postParams = _networkRequestType.getParams();
 		headerParams = _networkRequestType.getHeaders();
 		requestPath = request_path;
@@ -81,8 +83,12 @@ class NetworkSupportBase extends AsyncTask<URL, Integer, Long> {
 		try {
 			client = (HttpsURLConnection) url.openConnection();
 			client.setRequestMethod("POST");
+
 			client.setRequestProperty("Accept-Charset", "utf8");
 			client.setRequestProperty("Content-Type", "application/json");
+			client.setRequestProperty("User-Agent",
+					UserAgent.getInstance(this.myContext).getUserAgentString(""));
+
 			if (headerParams != null) {
 				Iterator it = headerParams.entrySet().iterator();
 				while (it.hasNext()) {

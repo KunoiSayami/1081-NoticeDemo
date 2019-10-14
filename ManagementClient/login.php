@@ -4,7 +4,7 @@
 	// copied from https://www.tutorialspoint.com/php/php_login_example.htm
 ?>
 
-<html lang = "en">
+<html>
 
    <head>
 	  <title>Login to console</title>
@@ -126,15 +126,15 @@
 				<form class = "form-signin" role = "form"
 				action = "<?php echo htmlspecialchars($_SERVER['PHP_SELF']);
 				?>" method = "post">
-				<h4 class = "form-signin-heading"><?php echo $msg; ?></h4>
-				<input type = "text" class = "form-control"
-				name = "username" placeholder = "Username"
-				required autofocus></br>
-				<input type = "current-password" class = "form-control"
-				name = "password" placeholder = "password" required>
-				<br>
-				<button class = "btn btn-lg btn-primary btn-block" type = "submit"
-				name = "login">Login</button>
+					<h4 class = "form-signin-heading"><?php echo $msg; ?></h4>
+					<input type = "text" class = "form-control"
+					name = "username" placeholder = "Username"
+					required autofocus></br>
+					<input type = "password" class = "form-control"
+					name = "password" placeholder = "password" required>
+					<br>
+					<button class = "btn btn-lg btn-primary btn-block" type = "submit"
+					name = "login">Login</button>
 				</form>
 
 

@@ -18,11 +18,13 @@
 		unset($_SESSION['valid']);
 		header("Location: login.php", true, 301);
 	}
-	$conn = mysqli_connect($DB_HOST, $DB_USER, $DB_PASSWORD, $DB_NAME, $DB_PORT);
+	// Update time after refresh this page
+	$_SESSION["timeout"] = time();
+	//$conn = mysqli_connect($DB_HOST, $DB_USER, $DB_PASSWORD, $DB_NAME, $DB_PORT);
 ?>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<script src="panel.js"></script>
+<script src="panel.js?<?php echo time();?>"></script>
 <script>
 	$(document).ready(function(){
 		init_panel();
@@ -37,24 +39,26 @@
 				<textarea name="message" cols="45" rows="4"></textarea></p>
 			</div>
 			<div id="firebase_control_right">
-				<input type="radio" id="set_to_all_client" name="reciever" value="1">
+				<input name="firebase_control" type="radio" id="set_to_all_client" value="1" checked="checked">
 				<label for="set_to_all_client">All</label>
-				<input type="radio" id="part_of_client" name="reciever" value="2">
-				<label for="part_of_client">Checked</label>
+				<input type="radio" id="part_of_client" name="firebase_control" value="2">
+				<label for="part_of_client">Only Checked Client</label>
+				<input type="radio" id="part_of_user" name="firebase_control" value="3">
+				<label for="part_of_user">Only Checked User</label>
 				<div id="firebase_device_id">
 				</div>
 			</div>
 
+			</form>
 			<div id="firebase_control_button">
 				<button type="submit" id="firebase_send">send</button>
 				<button id="firebase_form_reset">reset</button>
 				<button id="firebase_from_refresh">refresh</button>
 			</div>
-		</form>
 	</div>
 	Click <a href = "/login.php?action=logout">here</a> to logout Session.
 </html>
 
 <?php
-	mysqli_close($conn);
+	//mysqli_close($conn);
 ?>

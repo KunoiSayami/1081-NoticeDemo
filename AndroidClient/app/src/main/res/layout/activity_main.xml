@@ -28,4 +28,13 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtUserTitle" />
+
+    <ListView
+        android:id="@+id/lvNotices"
+        android:layout_width="wrap_content"
+        android:layout_height="592dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnLoginout" />
 </androidx.constraintlayout.widget.ConstraintLayout>

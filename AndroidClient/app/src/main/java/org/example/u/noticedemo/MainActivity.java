@@ -28,6 +28,7 @@ import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -44,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
 	static String TAG = "log_Main";
 	static DatabaseHelper databaseHelper;
 	private View.OnClickListener changeToLoginActivityListener, changeToLogoutListener;
+
+	ListView lvNotices;
 
 	static SessionManage userSession;
 
@@ -82,9 +85,15 @@ public class MainActivity extends AppCompatActivity {
 		startActivity(intent);
 	}
 
-	void init(){
+	void findView() {
 		txtUserTitle = findViewById(R.id.txtUserTitle);
 		btnLoginout = findViewById(R.id.btnLoginout);
+		lvNotices = findViewById(R.id.lvNotices);
+	}
+
+
+	void init(){
+		this.findView();
 		MainActivity.databaseHelper = new DatabaseHelper(this);
 		userSession = new SessionManage("", databaseHelper);
 
@@ -134,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
 			}
 		});
 		btnLoginout.setEnabled(false);
+		lvNotices.setVisibility(View.INVISIBLE);
 
 		// https://stackoverflow.com/a/19026743
 		accountEventReceiver = new BroadcastReceiver() {
@@ -142,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
 				txtUserTitle.setText(String.format(getString(R.string.welcome_title_formatter), databaseHelper.getLoginedUser()));
 				btnLoginout.setText(R.string.logout_text);
 				btnLoginout.setOnClickListener(changeToLogoutListener);
+				lvNotices.setVisibility(View.VISIBLE);
 			}
 		};
 		LocalBroadcastManager.getInstance(this).registerReceiver(accountEventReceiver,
@@ -159,6 +170,7 @@ public class MainActivity extends AppCompatActivity {
 								txtUserTitle.setText(String.format(getString(R.string.welcome_title_formatter), userSession.getUserName()));
 								btnLoginout.setText(R.string.logout_text);
 								btnLoginout.setOnClickListener(changeToLogoutListener);
+								lvNotices.setVisibility(View.VISIBLE);
 							}
 							else {
 								txtUserTitle.setText(R.string.no_user_login_title);

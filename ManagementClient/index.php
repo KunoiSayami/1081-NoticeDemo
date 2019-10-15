@@ -30,19 +30,29 @@
 		init_panel();
 	});
 </script>
+<style>
+	.scrollable_area{
+		height: 150px;
+		width: 40%;
+		overflow: hidden;
+		overflow-y: scroll;
+	}
+</style>
 <html>
 	<h1>Console</h1>
 	<div id="panel">
 		<form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']);?>" method="post">
 			<div id="firebase_control_left">
-				<input type="text" name="label" size="40"></p>
-				<textarea name="message" cols="45" rows="4"></textarea></p>
+				<h3>Title</h3>
+				<input type="text" name="label" size="40">
+				<h3>Message</h3>
+				<textarea name="message" cols="45" rows="4"></textarea>
 			</div>
 			<div id="firebase_control_right">
 				<input name="firebase_control" type="radio" id="set_to_all_client" value="1" checked="checked">
 				<label for="set_to_all_client">All</label>
 				<input type="radio" id="part_of_client" name="firebase_control" value="2">
-				<label for="part_of_client">Only Checked Client</label>
+				<label for="part_of_client">Only Checked Client(for developer only)</label>
 				<input type="radio" id="part_of_user" name="firebase_control" value="3">
 				<label for="part_of_user">Only Checked User</label>
 				<div id="firebase_device_id">

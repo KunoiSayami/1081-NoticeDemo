@@ -18,36 +18,34 @@
 
 
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
+		
 	}
 	elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
-		if (isset($_GET['t']) && $_GET['t'] == 'firebase_clients') {
-			if (isset($_GET['c'])) {
+		if (isset($_GET['t'])) {
+			if ($_GET['t'] == 'firebase_clients') {
 				$j = array(
 					"result" => null,
 					"data" => array()
 				);
-				if ($_GET['c'] == 'device') {
+				/*if ($_GET['c'] == 'device') { // Deprecated
 					$r = mysqli_query($conn, "SELECT `token` FROM `firebasetoken` WHERE `register_date` > DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 2 MONTH)");
 					while ($result = mysqli_fetch_assoc($r))
 						array_push($j["data"], $result["token"]);
-				}
-				elseif ($_GET['c'] == 'user') {
-					$r = mysqli_query($conn, "SELECT `user_id` FROM `firebasetoken` WHERE `register_date` > DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 2 MONTH)");
-					$users = array();
-					while ($result = mysqli_fetch_assoc($r))
-						//array_push($j["data"], $result["user_id"]);
-						array_push($users, $result["user_id"]);
-					array_unique($users);
+				}*/
+				$r = mysqli_query($conn, "SELECT `user_id` FROM `firebasetoken` WHERE `register_date` > DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 2 MONTH)");
+				$users = array();
+				while ($result = mysqli_fetch_assoc($r))
+					//array_push($j["data"], $result["user_id"]);
+					array_push($users, $result["user_id"]);
+				array_unique($users);
 
-					foreach ($users as $value) {
-						$r = mysqli_query($conn, "SELECT `username` FROM `accounts` WHERE `id` = $value");
-						$result = mysqli_fetch_assoc($r);
-						array_push($j["data"], $result["username"]);
-					}
+				foreach ($users as $value) {
+					$r = mysqli_query($conn, "SELECT `username` FROM `accounts` WHERE `id` = $value");
+					$result = mysqli_fetch_assoc($r);
+					$j["data"][$value] = $result["username"];
+					//array_push($j["data"], $result["username"]);
 				}
-
-				$j['result'] = !empty($j["data"])? "success": "error";
+				//$j['result'] = !empty($j["data"])? "success": "error";
 				echo json_encode($j, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 			}
 		}

@@ -22,7 +22,7 @@
 	$_SESSION["timeout"] = time();
 	//$conn = mysqli_connect($DB_HOST, $DB_USER, $DB_PASSWORD, $DB_NAME, $DB_PORT);
 ?>
-
+<link rel="stylesheet" type="text/css" href="panel.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="panel.js?<?php echo time();?>"></script>
 <script>
@@ -30,14 +30,6 @@
 		init_panel();
 	});
 </script>
-<style>
-	.scrollable_area{
-		height: 150px;
-		width: 40%;
-		overflow: hidden;
-		overflow-y: scroll;
-	}
-</style>
 <html>
 	<h1>Console</h1>
 	<div id="panel">
@@ -51,9 +43,9 @@
 			<div id="firebase_control_right">
 				<input name="firebase_control" type="radio" id="set_to_all_client" value="1" checked="checked">
 				<label for="set_to_all_client">All</label>
-				<input type="radio" id="part_of_client" name="firebase_control" value="2">
-				<label for="part_of_client">Only Checked Client(for developer only)</label>
-				<input type="radio" id="part_of_user" name="firebase_control" value="3">
+				<!--<input type="radio" id="part_of_client" name="firebase_control" value="2"> // Deprecated
+				<label for="part_of_client">Only Checked Client(for developer only)</label>-->
+				<input type="radio" id="part_of_user" name="firebase_control" value="2">
 				<label for="part_of_user">Only Checked User</label>
 				<div id="firebase_device_id">
 				</div>

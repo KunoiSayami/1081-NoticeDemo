@@ -1,4 +1,5 @@
 "use strict";
+
 var submit_button, radio_set_to_all_client_button, radio_set_to_part_of_user_button,
 	txt_firebase_notice_title, txt_firebase_notice_body;
 var refresh_button;
@@ -23,16 +24,19 @@ function init_panel() {
 	submit_button.addEventListener('click', async _ => {
 		try {
 			var select_users = [];
-			document.getElementsByName('device_id_group').forEach(element => {
-				select_users.push(element.value);
-			});
+			if (!radio_set_to_all_client_button.checked)
+				document.getElementsByName('device_id_group').forEach(element => {
+					select_users.push(element.value);
+				});
 			const response = await fetch('/request.php', {
 				method: 'post',
 				body: {
 					t: 'firebase_post',
-					title: txt_firebase_notice_title.value,
-					body: txt_firebase_notice_body.value,
-					select_user: select_users
+					payload: JSON.stringify({
+						title: txt_firebase_notice_title.value,
+						body: txt_firebase_notice_body.value,
+						select_user: (radio_set_to_all_client_button.checked ? select_users : 'all')
+					})
 				}
 			});
 		} catch (err) {

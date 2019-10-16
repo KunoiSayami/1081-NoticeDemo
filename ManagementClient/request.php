@@ -14,10 +14,16 @@
 	header("Cache-Control: post-check=0, pre-check=0", false);
 	header("Pragma: no-cache");
 
-
-
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-		
+		if (isset($_POST['t']))
+			if ($_POST['t'] === 'firebase_post' && isset($_POST['payload'])) {
+				$ch = curl_init($BACKEND_SERVER_ADDR + $BACKEND_FIREBASE_SEND_PATH);
+				curl_setopt_array($ch, array(CURLOPT_POST => 1, CURLOPT_POSTFIELDS => $_POST['payload'], CURLOPT_HEADER => 0, CURLOPT_RETURNTRANSFER => TRUE,
+					CURLOPT_HTTPHEADER => array('Content-Type: application/json', 'Content-Length: ' . strlen($_POST['payload']))));
+				curl_exec($ch);
+				http_response_code(200);
+				die();
+			}
 	}
 	elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
 		if (isset($_GET['t'])) {

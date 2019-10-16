@@ -11,4 +11,5 @@
 	static $DB_NAME = '';
 
 	static $BACKEND_SERVER_ADDR = ''; // Should in localhost will more secure
+	static $BACKEND_FIREBASE_SEND_PATH = '';
 ?>

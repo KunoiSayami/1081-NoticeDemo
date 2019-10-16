@@ -90,7 +90,7 @@
 						if (mysqli_num_rows($sqlObj) > 0) {
 							// Only one row will get
 							$row = mysqli_fetch_assoc($sqlObj);
-							echo $row['password'];
+							//echo $row['password'];
 							if ($row['password'] === $hash_passwd) {
 								$success_login = true;
 								$_SESSION['timeout'] = time();

@@ -36,9 +36,9 @@
 		<form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']);?>" method="post">
 			<div id="firebase_control_left">
 				<h3>Title</h3>
-				<input type="text" name="label" size="40">
+				<input type="text" id='firebase_send_title' name="label" size="40">
 				<h3>Message</h3>
-				<textarea name="message" cols="45" rows="4"></textarea>
+				<textarea name="message" id='firebase_send_body' cols="45" rows="4"></textarea>
 			</div>
 			<div id="firebase_control_right">
 				<input name="firebase_control" type="radio" id="set_to_all_client" value="1" checked="checked">

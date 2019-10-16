@@ -1,9 +1,10 @@
 "use strict";
-var submit_button, radio_set_to_all_client_button, radio_set_to_part_of_user_button;
+var submit_button, radio_set_to_all_client_button, radio_set_to_part_of_user_button,
+	txt_firebase_notice_title, txt_firebase_notice_body;
 var refresh_button;
 var div_firebase_device_id;
 var last_request_time = 0;
-const expire_time = 120 * 1000;
+const expire_time = 120 * 1000, label_offset = 2;
 var i, checkbox_disabled, checkbox_font_style_1;
 var last_request_type;
 
@@ -13,16 +14,25 @@ function findElementById() {
 	radio_set_to_part_of_user_button = document.getElementById('part_of_user');
 	refresh_button = document.getElementById('firebase_from_refresh');
 	div_firebase_device_id = document.getElementById('firebase_device_id');
+	txt_firebase_notice_title = document.getElementById('firebase_send_title');
+	txt_firebase_notice_body = document.getElementById('firebase_send_body');
 }
 
 function init_panel() {
 	findElementById();
 	submit_button.addEventListener('click', async _ => {
 		try {
+			var select_users = [];
+			document.getElementsByName('device_id_group').forEach(element => {
+				select_users.push(element.value);
+			});
 			const response = await fetch('/request.php', {
 				method: 'post',
 				body: {
-
+					t: 'firebase_post',
+					title: txt_firebase_notice_title.value,
+					body: txt_firebase_notice_body.value,
+					select_user: select_users
 				}
 			});
 		} catch (err) {
@@ -54,11 +64,13 @@ function process_firebase_token_data(raw_json) {
 		checkbox_disabled = '';
 		checkbox_font_style_1 = ''
 	}
+	// https://stackoverflow.com/a/14626707
 	if (Object.keys(raw_json.data).length < 5)
 		div_firebase_device_id.classList.remove("scrollable_area");
 	else
 		div_firebase_device_id.classList.add("scrollable_area");
 
+	// https://stackoverflow.com/a/18804596
 	Object.keys(raw_json.data).forEach(function(key, _value){
 		div_firebase_device_id.innerHTML +=
 			'<label><input type="checkbox" name="device_id_group" value="' + key +

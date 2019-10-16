@@ -14,7 +14,6 @@
 	header("Cache-Control: post-check=0, pre-check=0", false);
 	header("Pragma: no-cache");
 
-	$conn = mysqli_connect($DB_HOST, $DB_USER, $DB_PASSWORD, $DB_NAME, $DB_PORT);
 
 
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -23,6 +22,7 @@
 	elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
 		if (isset($_GET['t'])) {
 			if ($_GET['t'] == 'firebase_clients') {
+				$conn = mysqli_connect($DB_HOST, $DB_USER, $DB_PASSWORD, $DB_NAME, $DB_PORT);
 				$j = array(
 					"result" => null,
 					"data" => array()
@@ -47,9 +47,12 @@
 				}
 				//$j['result'] = !empty($j["data"])? "success": "error";
 				echo json_encode($j, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+				mysqli_close($conn);
+			}
+			elseif ($_GET['t'] === '204') {
+				http_response_code(204);
+				die();
 			}
 		}
 	}
-
-	mysqli_close($conn);
 ?>

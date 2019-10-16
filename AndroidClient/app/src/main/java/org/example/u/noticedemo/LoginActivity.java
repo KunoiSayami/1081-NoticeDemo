@@ -80,13 +80,12 @@ public class LoginActivity extends AppCompatActivity{
 		etRepeatPassword.addTextChangedListener(arrayList.get(2));
 	}
 
-	void onAfterLogin(CallbackLister _lister) {
-		this.lister = _lister;
-	}
-
 	void changeToRegisterLayout() {
 		_register_status = true;
 		txtTitle.setText(getString(R.string.text_title_register_page));
+		etPassword.setText("");
+		etUser.setText("");
+		btGoRegister.setEnabled(false);
 		txtRepeatPassword.setVisibility(View.VISIBLE);
 		etRepeatPassword.setVisibility(View.VISIBLE);
 		cbRemember.setVisibility(View.INVISIBLE);
@@ -141,6 +140,8 @@ public class LoginActivity extends AppCompatActivity{
 		//btLogin.setVisibility(View.VISIBLE);
 		cbRemember.setVisibility(View.VISIBLE);
 
+		checkRememberPassword();
+
 		etPassword.removeTextChangedListener(arrayList.get(1));
 
 		btGoRegister.setOnClickListener(new View.OnClickListener() {
@@ -152,6 +153,7 @@ public class LoginActivity extends AppCompatActivity{
 
 		btLogin.setText(R.string.text_login);
 		initbtnlogin();
+		btGoRegister.setEnabled(true);
 	}
 
 	private
@@ -220,13 +222,7 @@ public class LoginActivity extends AppCompatActivity{
 		etRepeatPassword.setVisibility(View.INVISIBLE);
 		txtRepeatPassword.setVisibility(View.INVISIBLE);
 
-		cbRemember.setChecked(MainActivity.databaseHelper.isRememberedPassword());
-
-		if (cbRemember.isChecked()) {
-			String[] accountGroup = MainActivity.databaseHelper.getStoredUser();
-			etUser.setText(accountGroup[0]);
-			etPassword.setText(accountGroup[1]);
-		}
+		checkRememberPassword();
 
 		initbtnlogin();
 
@@ -238,6 +234,7 @@ public class LoginActivity extends AppCompatActivity{
 				startActivity(intent);*/
 			}
 		});
+
 		appendTextWatcher();
 	}
 
@@ -307,6 +304,17 @@ public class LoginActivity extends AppCompatActivity{
 			Toast.makeText(LoginActivity.this,  (_register_status ? "Register": "Login")+" error", Toast.LENGTH_SHORT).show();
 		}
 	}
+
+	void checkRememberPassword() {
+		cbRemember.setChecked(MainActivity.databaseHelper.isRememberedPassword());
+
+		if (cbRemember.isChecked()) {
+			String[] accountGroup = MainActivity.databaseHelper.getStoredUser();
+			etUser.setText(accountGroup[0]);
+			etPassword.setText(accountGroup[1]);
+		}
+	}
+
 	void register_callback(HttpRawResponse httpRawResponse) {
 		if (httpRawResponse.getStatus() == 200) {
 			Toast.makeText(LoginActivity.this, "Register success", Toast.LENGTH_SHORT).show();

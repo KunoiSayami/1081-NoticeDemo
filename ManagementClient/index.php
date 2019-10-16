@@ -25,9 +25,13 @@
 <link rel="stylesheet" type="text/css" href="panel.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="panel.js?<?php echo time();?>"></script>
+<script src="keepalive.js"></script>
 <script>
 	$(document).ready(function(){
 		init_panel();
+		setTimeout(() => {
+			getAndSetTimeout();
+		}, 1200);
 	});
 </script>
 <html>
@@ -58,7 +62,7 @@
 				<button id="firebase_from_refresh">refresh</button>
 			</div>
 	</div>
-	Click <a href = "/login.php?action=logout">here</a> to logout Session.
+	Click <a href="/login.php?action=logout">here</a> to logout Session.
 </html>
 
 <?php

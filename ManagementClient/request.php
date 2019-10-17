@@ -1,12 +1,11 @@
 <?php
-	@session_start();
-	require_once(".config.inc.php");
-	if (!$_SESSION["valid"]){
+	require_once('.config.inc.php');
+	if (!$_SESSION['valid']){
 		header('Location: /login.php', true, 301);
 		die();
 	}
 	else {
-		$_SESSION["timeout"] = time();
+		$_SESSION['timeout'] = time();
 	}
 
 	// https://stackoverflow.com/a/13640164
@@ -17,13 +16,24 @@
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		if (isset($_POST['t']))
 			if ($_POST['t'] === 'firebase_post' && isset($_POST['payload'])) {
-				$ch = curl_init($BACKEND_SERVER_ADDR + $BACKEND_FIREBASE_SEND_PATH);
-				curl_setopt_array($ch, array(CURLOPT_POST => 1, CURLOPT_POSTFIELDS => $_POST['payload'], CURLOPT_HEADER => 0, CURLOPT_RETURNTRANSFER => TRUE,
-					CURLOPT_HTTPHEADER => array('Content-Type: application/json', 'Content-Length: ' . strlen($_POST['payload']))));
+				$ch = curl_init($BACKEND_SERVER_ADMIN_PAGE);
+				$payload = json_decode($_POST['payload'], true);
+				$payload['t'] = $_POST['t'];
+				$payload = json_encode($payload);
+				curl_setopt_array($ch, array(CURLOPT_POST => 1, CURLOPT_POSTFIELDS => $payload, CURLOPT_HEADER => 0, CURLOPT_RETURNTRANSFER => TRUE,
+					CURLOPT_HTTPHEADER => array('Content-Type: application/json', 'Content-Length: ' . strlen($payload))));
 				curl_exec($ch);
-				http_response_code(200);
+				if (curl_errno($ch)) {
+					http_response_code(502);
+					die('Couldn\'t send request: ' . curl_error($ch));
+				}
+				http_response_code(204);
 				die();
 			}
+		else {
+			http_response_code(400);
+			die('Bad request');
+		}
 	}
 	elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
 		if (isset($_GET['t'])) {
@@ -59,6 +69,10 @@
 				http_response_code(204);
 				die();
 			}
+		}
+		else {
+			http_response_code(400);
+			die('Bad request');
 		}
 	}
 ?>

@@ -21,27 +21,20 @@ function findElementById() {
 
 function init_panel() {
 	findElementById();
-	submit_button.addEventListener('click', async _ => {
-		try {
-			var select_users = [];
-			if (!radio_set_to_all_client_button.checked)
-				document.getElementsByName('device_id_group').forEach(element => {
-					select_users.push(element.value);
-				});
-			const response = await fetch('/request.php', {
-				method: 'post',
-				body: {
-					t: 'firebase_post',
-					payload: JSON.stringify({
-						title: txt_firebase_notice_title.value,
-						body: txt_firebase_notice_body.value,
-						select_user: (radio_set_to_all_client_button.checked ? select_users : 'all')
-					})
-				}
+	submit_button.addEventListener('click', function() {
+		var select_users = [];
+		if (!radio_set_to_all_client_button.checked)
+			document.getElementsByName('device_id_group').forEach(element => {
+				select_users.push(element.value);
 			});
-		} catch (err) {
-			console.error(`Error: ${err}`);
-		}
+		$.post('/request.php', {
+			t: 'firebase_post',
+			payload: JSON.stringify({
+				title: txt_firebase_notice_title.value,
+				body: txt_firebase_notice_body.value,
+				select_user: (radio_set_to_all_client_button.checked ? 'all' : select_users)
+			})
+		});
 	});
 	radio_set_to_all_client_button.addEventListener('click', function() {
 		refresh_firebase_clients(true);

@@ -27,6 +27,7 @@ from configparser import ConfigParser
 from http.server import HTTPServer
 from server import Server as _exServer
 from http_status_code import HTTP_STATUS_CODES
+import fcmbackend
 
 expire_day = 2 * 60 * 60 * 24
 
@@ -110,10 +111,29 @@ class Server(_exServer):
 
 		return HTTP_STATUS_CODES.ERROR_INVALID_REQUEST
 
-
 	def handle_manage_request(self, d: dict):
-		if self.headers.get('X-Real-IP') not in Server.mdict['trust_ip']:
+		# Not behind reversed proxy, bypass it
+		if self.headers.get('X-Real-IP') and self.headers.get('X-Real-IP') not in Server.mdict['trust_ip']:
 			return HTTP_STATUS_CODES.ERROR_403_FORBIDDEN
+		if 't' not in d:
+			return HTTP_STATUS_CODES.ERROR_400_BAD_REQUEST
+		if d['t'] == 'firebase_post':
+			if d['select_user'] == 'all':
+				sqlObj = Server.conn.query("SELECT `token` FROM `firebasetoken` WHERE `register_date` > DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 2 MONTH)")
+				if len(sqlObj) == 1:
+					r = Server.fcmbackend.push_services(sqlObj[0]['token'], d['title'], d['body'])
+				else:
+					r = Server.fcmbackend.push_services([x['token'] for x in sqlObj], d['title'], d['body'])
+			else: # part of user
+				devices = []
+				for user in d['select_user']:
+					sqlObj = Server.conn.quey("SELECT `token` FROM `firebasetoken` WHERE `user_id` = %s AND `register_date` > DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 2 MONTH)", user)
+					devices.extend(x['token'] for x in sqlObj)
+				if len(devices) == 1:
+					r = Server.fcmbackend.push_services(devices[0], d['title'], d['body'])
+				else:
+					r = Server.fcmbackend.push_services(devices, d['title'], d['body'])
+			return HTTP_STATUS_CODES.SUCCESS_200OK
 		return HTTP_STATUS_CODES.ERROR_400_BAD_REQUEST
 
 	@staticmethod
@@ -149,8 +169,11 @@ class appServer:
 		if self.config.has_option('server', 'trust_ip'):
 			self.mdict['trust_ip'] = list(map(str, self.config['server']['trust_ip'].split(',')))
 
+		self.fcmService = fcmbackend.fcmService(self.config['firebase']['api_key'])
+
 		setattr(Server, 'conn', self.mysql_conn)
 		setattr(Server, 'mdict', self.mdict)
+		setattr(Server, 'fcmbackend', self.fcmService)
 
 		self.server_handle = HTTPServer(
 			(self.config['server']['address'], int(self.config['server']['port'])),

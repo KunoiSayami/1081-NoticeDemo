@@ -1,5 +1,4 @@
 <?php
-    @session_start();
 	require_once('.config.inc.php');
 	if (!$_SESSION['valid']){
 		echo "<html>
@@ -48,13 +47,11 @@
 				<h3>Title</h3>
 				<input type="text" id='firebase_send_title' name="label" size="40">
 				<h3>Message</h3>
-				<textarea name="message" id='firebase_send_body' cols="45" rows="4"></textarea>
+				<textarea name="message" id='firebase_send_body' cols="45" rows="4" required></textarea>
 			</div>
 			<div id="firebase_control_right">
 				<input name="firebase_control" type="radio" id="set_to_all_client" value="1" checked="checked">
 				<label for="set_to_all_client">All</label>
-				<!--<input type="radio" id="part_of_client" name="firebase_control" value="2"> // Deprecated
-				<label for="part_of_client">Only Checked Client(for developer only)</label>-->
 				<input type="radio" id="part_of_user" name="firebase_control" value="2">
 				<label for="part_of_user">Only Checked User</label>
 				<div id="firebase_device_id">

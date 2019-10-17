@@ -1,5 +1,4 @@
 <?php
-	@session_start();
 	require_once('.config.inc.php');
 	// copied from https://www.tutorialspoint.com/php/php_login_example.htm
 ?>
@@ -117,7 +116,7 @@
 						if (isset($_GET['action']) && $_GET['action'] == 'logout'){
 							unset($_SESSION['valid']);
 						}
-						elseif ($_SESSION['valid']) {
+						elseif (isset($_SESSION['valid']) && $_SESSION['valid']) {
 							header("Location: /", true, 301);
 						}
 					}

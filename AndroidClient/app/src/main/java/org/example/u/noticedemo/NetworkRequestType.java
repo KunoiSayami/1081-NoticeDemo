@@ -24,7 +24,7 @@ import java.util.HashMap;
 
 import static org.example.u.noticedemo.SHA512Support.getHashedPassword;
 
-class NetworkRequestType {
+public class NetworkRequestType {
 	private HashMap<String, String> params, headers;
 	NetworkRequestType(HashMap<String, String> _params, HashMap<String, String> _headers){
 		params = _params;

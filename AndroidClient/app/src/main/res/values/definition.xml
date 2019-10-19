@@ -13,6 +13,7 @@
     <string name="logout_field">logout</string>
     <string name="firebase_id_register_field">firebase_register</string>
     <string name="verify_session_field">verify_session</string>
+    <string name="fetch_notification_field">fetch_notification</string>
     <!-- Json field name end -->
 
     <string name="welcome_title_formatter">Welcome back! %s</string>

@@ -68,6 +68,10 @@ public class SessionManage {
 		userSession = db.getSessionString();
 	}
 
+	@Override
+	public String toString() {
+		return userSession;
+	}
 
 	String setFirebaseID(String newFirebaseID) {
 		firebaseID = newFirebaseID;

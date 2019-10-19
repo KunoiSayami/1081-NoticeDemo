@@ -1,4 +1,7 @@
-package org.example.u.noticedemo.listSupport;
+package org.example.u.noticedemo.types;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class NotificationType {
 	private String title;
@@ -7,12 +10,16 @@ public class NotificationType {
 		this.title = _title;
 		this.body = _body;
 	}
+	public NotificationType(JSONObject j) throws JSONException {
+		this.title = j.get("title").toString();
+		this.body = j.get("body").toString();
+	}
 
-	String getTitle() {
+	public String getTitle() {
 		return this.title;
 	}
 
-	String getBodyShort() {
+	public String getBodyShort() {
 		if (getBody().length() > 50) {
 			return getBody().substring(0, 50);
 		}

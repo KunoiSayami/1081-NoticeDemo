@@ -42,7 +42,10 @@ import com.google.firebase.iid.InstanceIdResult;
 
 
 import org.example.u.noticedemo.listSupport.NotificationAdapter;
-import org.example.u.noticedemo.listSupport.NotificationType;
+import org.example.u.noticedemo.types.FetchedNotificationArrayType;
+import org.example.u.noticedemo.types.NotificationType;
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.util.ArrayList;
 
@@ -191,11 +194,29 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
-	void init_listView() {
-		ArrayList<NotificationType> listArray = new ArrayList<>();
+	@Override
+	protected void onResume() {
+		new Connect(NetworkRequestType.generateFetchNotificationParams(userSession.toString()), NetworkPath.fetch_notification_path,
+				new OnTaskCompleted() {
+					@Override
+					public void onTaskCompleted(Object o) {
+						try {
+							JSONArray jsonArray = new JSONArray(((HttpRawResponse)o).getOptions().get(0).toString());
+							init_listView(new FetchedNotificationArrayType(jsonArray).getNotifications());
+						} catch (JSONException e) {
+							e.printStackTrace();
+						}
+					}
+				}).execute();
+		super.onResume();
+	}
+
+	void init_listView(ArrayList<NotificationType> listArray) {
 		final NotificationAdapter notificationAdapter = new NotificationAdapter(this, listArray);
 		this.lvNotices.setAdapter(notificationAdapter);
-
+		for (NotificationType nt: listArray) {
+			notificationAdapter.add(nt);
+		}
 	}
 
 	void setLogoutListener() {

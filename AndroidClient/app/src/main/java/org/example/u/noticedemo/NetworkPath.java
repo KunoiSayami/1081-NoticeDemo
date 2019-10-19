@@ -33,6 +33,7 @@ public class NetworkPath {
 	static String logout_path = "";
 	static String verify_session_path = "";
 	static String firebase_id_register_path = "";
+	static String fetch_notification_path = "";
 
 	static final String TAG = "log_(static)networkPath";
 
@@ -50,6 +51,7 @@ public class NetworkPath {
 				verify_session_path = jsonObjects[1].get(context.getString(R.string.verify_session_field)).toString();
 				firebase_id_register_path = jsonObjects[1].get(context.getString(R.string.firebase_id_register_field)).toString();
 				logout_path = jsonObjects[1].get(context.getString(R.string.logout_field)).toString();
+				fetch_notification_path = jsonObjects[1].get(context.getString(R.string.fetch_notification_field)).toString();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

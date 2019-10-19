@@ -1,6 +1,5 @@
 package org.example.u.noticedemo.listSupport;
 
-import android.app.Notification;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import org.example.u.noticedemo.R;
+import org.example.u.noticedemo.types.NotificationType;
 
 import java.util.ArrayList;
 

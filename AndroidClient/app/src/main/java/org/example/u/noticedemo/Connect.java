@@ -22,6 +22,7 @@ package org.example.u.noticedemo;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.example.u.noticedemo.types.NetworkRequestType;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;

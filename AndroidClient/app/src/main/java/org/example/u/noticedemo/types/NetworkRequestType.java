@@ -17,7 +17,7 @@
  ** You should have received a copy of the GNU Affero General Public License
  ** along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package org.example.u.noticedemo;
+package org.example.u.noticedemo.types;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -33,38 +33,38 @@ public class NetworkRequestType {
 		}
 		headers = _headers;
 	}
-	HashMap<String, String> getParams() {
+	public HashMap<String, String> getParams() {
 		return params;
 	}
 
-	HashMap<String, String> getHeaders() {
+	public HashMap<String, String> getHeaders() {
 		return headers;
 	}
 
-	static NetworkRequestType generateLogoutParams(String session_string) {
+	public static NetworkRequestType generateLogoutParams(String session_string) {
 		HashMap<String, String> _headers = new HashMap<>();
 		_headers.put("A-auth", session_string);
 		return new NetworkRequestType(null, _headers);
 	}
 
-	static NetworkRequestType generateVerifyParams(String user, String session_string) {
+	public static NetworkRequestType generateVerifyParams(String user, String session_string) {
 		HashMap<String, String> _headers = new HashMap<>();
 		_headers.put("A-user", user);
 		_headers.put("A-auth", session_string);
 		return new NetworkRequestType(null, _headers);
 	}
 
-	static NetworkRequestType generateRegisterParams(String user, String password)
+	public static NetworkRequestType generateRegisterParams(String user, String password)
 			throws NoSuchAlgorithmException{
 		return _generateAccountAction(user, password);
 	}
 
-	static NetworkRequestType generateLoginParams(String user, String password)
+	public static NetworkRequestType generateLoginParams(String user, String password)
 			throws NoSuchAlgorithmException{
 		return _generateAccountAction(user, password);
 	}
 
-	static NetworkRequestType generateRegisterFirebaseIDParams(String firebaseID, String sessionStr){
+	public static NetworkRequestType generateRegisterFirebaseIDParams(String firebaseID, String sessionStr){
 		HashMap<String, String> params = new HashMap<>();
 		params.put("token", firebaseID);
 		HashMap<String, String> _headers = new HashMap<>();
@@ -72,7 +72,7 @@ public class NetworkRequestType {
 		return new NetworkRequestType(params, _headers);
 	}
 
-	static NetworkRequestType generateFetchNotificationParams(String sessionStr) {
+	public static NetworkRequestType generateFetchNotificationParams(String sessionStr) {
 		HashMap<String, String> headerParams = new HashMap<>();
 		headerParams.put("A-auth", sessionStr);
 		return new NetworkRequestType(null, headerParams);

@@ -19,6 +19,8 @@
  */
 package org.example.u.noticedemo;
 
+import org.example.u.noticedemo.types.NetworkRequestType;
+
 class FirebaseNetworkSupport extends Connect {
 	FirebaseNetworkSupport(String firebase_id) {
 		super(NetworkRequestType.generateRegisterFirebaseIDParams(

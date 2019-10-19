@@ -23,8 +23,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 // https://stackoverflow.com/a/46510436
-class SHA512Support {
-	static String getHashedPassword(String passwordToHash) throws NoSuchAlgorithmException {
+public class SHA512Support {
+	public static String getHashedPassword(String passwordToHash) throws NoSuchAlgorithmException {
 		MessageDigest md = MessageDigest.getInstance("SHA-512");
 		byte[] digest = md.digest(passwordToHash.getBytes());
 		StringBuilder stringBuilder = new StringBuilder();

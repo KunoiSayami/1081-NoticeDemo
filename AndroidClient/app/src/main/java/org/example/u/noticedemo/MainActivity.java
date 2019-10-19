@@ -19,14 +19,17 @@
 */
 package org.example.u.noticedemo;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -41,6 +44,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
 
+import org.example.u.noticedemo.types.NetworkRequestType;
 import org.example.u.noticedemo.types.NotificationAdapter;
 import org.example.u.noticedemo.types.FetchedNotificationArrayType;
 import org.example.u.noticedemo.types.NotificationType;
@@ -191,6 +195,13 @@ public class MainActivity extends AppCompatActivity {
 						}
 					},true).execute();
 		}
+
+		this.lvNotices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				visableDialog((NotificationType) lvNotices.getItemAtPosition(position));
+			}
+		});
 	}
 
 	@Override
@@ -218,6 +229,23 @@ public class MainActivity extends AppCompatActivity {
 		for (NotificationType nt: notificationList){
 			notificationAdapter.add(nt);
 		}
+
+	}
+
+
+	private void visableDialog(final NotificationType nt) {
+		/* copied from https://stackoverflow.com/questions/6264694/how-to-add-message-box-with-ok-button */
+		AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
+		dlgAlert.setTitle(nt.getTitle());
+		dlgAlert.setMessage(nt.getBody());
+		dlgAlert.setPositiveButton("OK",
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						//dismiss the dialog
+					}
+				});
+		dlgAlert.setCancelable(true);
+		dlgAlert.create().show();
 	}
 
 	void setLogoutListener() {

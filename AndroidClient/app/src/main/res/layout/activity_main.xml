@@ -32,8 +32,8 @@
 
     <ListView
         android:id="@+id/lvNotices"
-        android:layout_width="wrap_content"
-        android:layout_height="592dp"
+        android:layout_width="388dp"
+        android:layout_height="591dp"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

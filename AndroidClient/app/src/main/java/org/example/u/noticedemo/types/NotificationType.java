@@ -45,7 +45,7 @@ public class NotificationType {
 		return getBody();
 	}
 
-	String getBody() {
+	public String getBody() {
 		return this.body;
 	}
 

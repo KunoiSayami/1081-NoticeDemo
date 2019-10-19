@@ -19,6 +19,8 @@
  */
 package org.example.u.noticedemo;
 
+import org.example.u.noticedemo.types.NetworkRequestType;
+
 import java.security.NoSuchAlgorithmException;
 
 import static org.example.u.noticedemo.NetworkPath.login_path;

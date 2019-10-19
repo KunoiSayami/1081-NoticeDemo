@@ -7,11 +7,12 @@
         android:id="@+id/txtNotificationTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="30px" />
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/txtNotificationBody"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="20px" />
+        android:textAlignment="textEnd"
+        android:textSize="13sp" />
 </LinearLayout>

@@ -21,6 +21,8 @@ package org.example.u.noticedemo;
 
 import androidx.annotation.NonNull;
 
+import org.example.u.noticedemo.types.NetworkRequestType;
+
 public class SessionManage {
 	private String firebaseID;
 	private String userName;

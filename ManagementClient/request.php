@@ -21,13 +21,20 @@
 				$payload['t'] = $_POST['t'];
 				$payload = json_encode($payload);
 				curl_setopt_array($ch, array(CURLOPT_POST => 1, CURLOPT_POSTFIELDS => $payload, CURLOPT_HEADER => 0, CURLOPT_RETURNTRANSFER => TRUE,
-					CURLOPT_HTTPHEADER => array('Content-Type: application/json', 'Content-Length: ' . strlen($payload))));
-				curl_exec($ch);
+					CURLOPT_HTTPHEADER => array('Content-Type: application/json', 'Content-Length: ' . strlen($payload)),
+					CURLOPT_TCP_FASTOPEN => TRUE));
+				$response = curl_exec($ch);
 				if (curl_errno($ch)) {
 					http_response_code(502);
 					die('Couldn\'t send request: ' . curl_error($ch));
 				}
-				http_response_code(204);
+				$response = json_decode($response, true);
+				if ($response['status'] == 200)
+					http_response_code(204);
+				else {
+					http_response_code(400);
+					die('Server return error: ' . $response['error']['info']);
+				}
 				die();
 			}
 		else {

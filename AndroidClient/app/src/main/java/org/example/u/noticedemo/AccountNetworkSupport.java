@@ -19,8 +19,6 @@
  */
 package org.example.u.noticedemo;
 
-import android.content.Context;
-
 import java.security.NoSuchAlgorithmException;
 
 import static org.example.u.noticedemo.NetworkPath.login_path;

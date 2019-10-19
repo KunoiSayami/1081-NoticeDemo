@@ -28,6 +28,7 @@ from http.server import HTTPServer
 from server import Server as _exServer
 from http_status_code import HTTP_STATUS_CODES
 import fcmbackend
+import json
 
 expire_day = 2 * 60 * 60 * 24
 
@@ -49,33 +50,52 @@ class Server(_exServer):
 			return False, HTTP_STATUS_CODES.ERROR_USER_SESSION_EXPIRED, sqlObj
 		return True, HTTP_STATUS_CODES.SUCCESS_VERIFY_SESSION, sqlObj
 
-	def getJsonObject(self, input_json: dict):
+	def _do_GET(self):
+		A_auth = self.headers.get('A-auth')
+
+		if self.path == '/fetchNotification':
+			if A_auth is None:
+				user_id = 0
+			else:
+				sqlObj = Server.conn.query1("SELECT `user_id` FROM `user_session` WHERE `session` = %s", A_auth)
+				if sqlObj is None:
+					user_id = 0
+				else:
+					user_id = sqlObj['user_id']
+			sqlObj = Server.conn.query("SELECT `title`, `body` FROM `notifications` WHERE "
+				"(`affected_user` LIKE '%%{}%%' OR `affected_user` = 'all') AND `timestamp` > DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 15 DAY) ".format(user_id) +
+				"ORDER BY `timestamp` DESC LIMIT 15")
+			return HTTP_STATUS_CODES.SUCCESS_FETCH_NOTIFICATIONS([{'title': x['title'], 'body': x['body']} for x in sqlObj])
+
+		return HTTP_STATUS_CODES.ERROR_400_BAD_REQUEST
+
+	def _do_POST(self, jsonObject: dict):
 		A_auth = self.headers.get('A-auth')
 
 		# Process user login
 		if self.path == '/login':
-			sqlObj = Server.conn.query1("SELECT * FROM `accounts` WHERE `username` = %s", input_json['user'])
+			sqlObj = Server.conn.query1("SELECT * FROM `accounts` WHERE `username` = %s", jsonObject['user'])
 			if sqlObj is None:
-				self.log_login_attmept(input_json['user'], False)
+				self.log_login_attmept(jsonObject['user'], False)
 				return HTTP_STATUS_CODES.ERROR_INVALID_PASSWORD_OR_USER
 			else:
-				if sqlObj['password'] != input_json['password']:
-					self.log_login_attmept(input_json['user'], False)
+				if sqlObj['password'] != jsonObject['password']:
+					self.log_login_attmept(jsonObject['user'], False)
 					return HTTP_STATUS_CODES.ERROR_INVALID_PASSWORD_OR_USER
 				else:
-					self.log_login_attmept(input_json['user'], True)
-					session = self.generate_new_session_str(input_json['user'])
+					self.log_login_attmept(jsonObject['user'], True)
+					session = self.generate_new_session_str(jsonObject['user'])
 					Server.conn.execute("INSERT INTO `user_session` (`session`, `user_id`) VALUE (%s, %s)", (session, sqlObj['id']))
-					return HTTP_STATUS_CODES.SUCCESS_LOGIN(input_json['user'], session)
+					return HTTP_STATUS_CODES.SUCCESS_LOGIN(jsonObject['user'], session)
 
 		# Process register user
 		elif self.path == '/register':
-			if len(input_json['user']) > 16:
+			if len(jsonObject['user']) > 16:
 				return HTTP_STATUS_CODES.ERROR_USERNAME_TOO_LONG
-			sqlObj = Server.conn.query1("SELECT * FROM `accounts` WHERE `username` = %s", input_json['user'])
+			sqlObj = Server.conn.query1("SELECT * FROM `accounts` WHERE `username` = %s", jsonObject['user'])
 			if sqlObj is None:
 				Server.conn.execute("INSERT INTO `accounts` (`username`, `password`) VALUE (%s, %s)",
-					(input_json['user'], input_json['password']))
+					(jsonObject['user'], jsonObject['password']))
 				return HTTP_STATUS_CODES.SUCCESS_REGISTER
 			else:
 				return HTTP_STATUS_CODES.ERROR_USERNAME_ALREADY_EXIST
@@ -84,13 +104,13 @@ class Server(_exServer):
 		elif self.path == '/register_firebase':
 			r, rt_value, sqlObj = self.verify_user_session(A_auth)
 			if not r: return rt_value
-			sqlObj1 = Server.conn.query1("SELECT `user_id` FROM `firebasetoken` WHERE `token` = %s", input_json['token'])
+			sqlObj1 = Server.conn.query1("SELECT `user_id` FROM `firebasetoken` WHERE `token` = %s", jsonObject['token'])
 			if sqlObj1 is None:
-				Server.conn.execute("INSERT INTO `firebasetoken` (`user_id`, `token`) VALUE (%s, %s)", (sqlObj['user_id'], input_json['token']))
+				Server.conn.execute("INSERT INTO `firebasetoken` (`user_id`, `token`) VALUE (%s, %s)", (sqlObj['user_id'], jsonObject['token']))
 			elif sqlObj['user_id'] != sqlObj1['user_id']:
-				Server.conn.execute("UPDATE `firebasetoken` SET `user_id` = %s WHERE `token` = %s", (sqlObj['user_id'], input_json['token']))
+				Server.conn.execute("UPDATE `firebasetoken` SET `user_id` = %s WHERE `token` = %s", (sqlObj['user_id'], jsonObject['token']))
 			else:
-				Server.conn.execute("UPDATE `firebasetoken` SET `register_date` = CURRENT_TIMESTAMP() WHERE `token` = %s", input_json['token'])
+				Server.conn.execute("UPDATE `firebasetoken` SET `register_date` = CURRENT_TIMESTAMP() WHERE `token` = %s", jsonObject['token'])
 			return HTTP_STATUS_CODES.SUCCESS_REGISTER_FIREBASE_ID
 		
 
@@ -107,7 +127,7 @@ class Server(_exServer):
 			return HTTP_STATUS_CODES.SUCCESS_LOGOUT
 
 		elif self.path == '/admin':
-			return self.handle_manage_request(input_json)
+			return self.handle_manage_request(jsonObject)
 
 		return HTTP_STATUS_CODES.ERROR_INVALID_REQUEST
 
@@ -133,6 +153,14 @@ class Server(_exServer):
 					r = Server.fcmbackend.push_services(devices[0], d['title'], d['body'])
 				else:
 					r = Server.fcmbackend.push_services(devices, d['title'], d['body'])
+			if r['failure'] > 0:
+				if r['success'] == 0:
+					return HTTP_STATUS_CODES.ERROR_SEND_FIREBASE_NOTIFICATION_FAILURE
+				else:
+					return HTTP_STATUS_CODES.ERROR_SEND_FIREBASE_NOTIFICATION_PARTILAL_FAILURE
+			u = ','.join(d['select_user']) if d['select_user'] != 'all' else 'all'
+			Server.conn.execute("INSERT INTO `notifications` (`title`, `body`, `affected_user`) VALUE (%s, %s, %s)",
+				(d['title'], d['body'], u))
 			return HTTP_STATUS_CODES.SUCCESS_200OK
 		return HTTP_STATUS_CODES.ERROR_400_BAD_REQUEST
 

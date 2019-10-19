@@ -44,13 +44,17 @@ class Server(BaseHTTPRequestHandler):
 	def do_HEAD(self):
 		self._set_headers()
 
+	def _do_GET(self):
+		return 200, [], {'code': 0, 'info': ''}
+
 	# GET sends back a Hello world message
 	def do_GET(self):
+		status, options, errors = self._do_GET()
 		self._set_headers()
-		self.wfile.write(build_status_json(200, [], 0))
+		self.wfile.write(build_status_json(status, options, errors))
 
-	def getJsonObject(self, input_json: dict):
-		return 200, [], {'code': 0, 'info': ''}
+	def _do_POST(self, _jsonObject: dict):
+		return self._do_GET()
 
 	# POST echoes the message adding a JSON field
 	def do_POST(self):
@@ -67,7 +71,7 @@ class Server(BaseHTTPRequestHandler):
 		input_json = json.loads(self.rfile.read(length))
 
 		# add a property to the object, just to mess with data
-		status, options, errors = self.getJsonObject(input_json)
+		status, options, errors = self._do_POST(input_json)
 
 		# send the message back
 		self._set_headers()

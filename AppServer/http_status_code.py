@@ -60,5 +60,20 @@ class http_status_codes:
 	@property
 	def ERROR_403_FORBIDDEN(self):
 		return (403, [], self.generate_error_dict(403, 'Forbidden'))
+	
+	@property
+	def SUCCESS_SEND_FIREBASE_NOTIFICATION(self):
+		return self.SUCCESS_200OK
+	
+	@property
+	def ERROR_SEND_FIREBASE_NOTIFICATION_FAILURE(self):
+		return (400, [], self.generate_error_dict(1001, 'Send notification failure'))
+	
+	@property
+	def ERROR_SEND_FIREBASE_NOTIFICATION_PARTILAL_FAILURE(self):
+		return (400, [], self.generate_error_dict(1002, 'Send notification partial failure'))
+
+	def SUCCESS_FETCH_NOTIFICATIONS(self, jsonObj: str):
+		return (200, [jsonObj,], self.generate_error_dict(0, ''))
 
 HTTP_STATUS_CODES = http_status_codes()

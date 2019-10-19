@@ -2,7 +2,7 @@
 
 var submit_button, radio_set_to_all_client_button, radio_set_to_part_of_user_button,
 	txt_firebase_notice_title, txt_firebase_notice_body;
-var refresh_button;
+var refresh_button, reset_button;
 var div_firebase_device_id;
 var last_request_time = 0;
 const expire_time = 120 * 1000, label_offset = 2;
@@ -17,10 +17,17 @@ function findElementById() {
 	div_firebase_device_id = document.getElementById('firebase_device_id');
 	txt_firebase_notice_title = document.getElementById('firebase_send_title');
 	txt_firebase_notice_body = document.getElementById('firebase_send_body');
+	reset_button = document.getElementById('firebase_form_reset');
 }
 
 function init_panel() {
 	findElementById();
+	radio_set_to_all_client_button.addEventListener('click', function() {
+		refresh_firebase_clients(true);
+	});
+	radio_set_to_part_of_user_button.addEventListener('click', function() {
+		refresh_firebase_clients(true);
+	});
 	submit_button.addEventListener('click', function() {
 		var select_users = [];
 		if (!radio_set_to_all_client_button.checked)
@@ -36,11 +43,9 @@ function init_panel() {
 			})
 		});
 	});
-	radio_set_to_all_client_button.addEventListener('click', function() {
-		refresh_firebase_clients(true);
-	});
-	radio_set_to_part_of_user_button.addEventListener('click', function() {
-		refresh_firebase_clients(true);
+	reset_button.addEventListener('click', function() {
+		txt_firebase_notice_title.value = '';
+		txt_firebase_notice_body.value = '';
 	});
 	refresh_button.addEventListener('click', function(_event) {
 		refresh_firebase_clients(true);

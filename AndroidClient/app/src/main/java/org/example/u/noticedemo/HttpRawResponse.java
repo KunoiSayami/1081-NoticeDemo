@@ -68,7 +68,7 @@ class HttpRawResponse {
 
 	String getSessionUser() {
 		try {
-			return getOptions().get(user_name_offset).toString();
+			return getOptions().getString(user_name_offset);
 		}
 		catch (JSONException e){
 			e.printStackTrace();
@@ -78,7 +78,7 @@ class HttpRawResponse {
 
 	String getSessionString() {
 		try {
-			return getOptions().get(user_session_offset).toString();
+			return getOptions().getString(user_session_offset);
 		}
 		catch (JSONException e){
 			e.printStackTrace();

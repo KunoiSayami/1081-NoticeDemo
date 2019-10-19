@@ -26,16 +26,16 @@ import java.security.NoSuchAlgorithmException;
 import static org.example.u.noticedemo.NetworkPath.login_path;
 import static org.example.u.noticedemo.NetworkPath.register_path;
 
-public class AccountNetworkSupport extends NetworkSupportBase {
+public class AccountNetworkSupport extends Connect {
 	private static final String TAG = "log_AccountNetworkSupport";
-	AccountNetworkSupport(Context context, String user, String password, boolean is_register)
+	AccountNetworkSupport(String user, String password, OnTaskCompleted o, boolean is_register)
 			throws NoSuchAlgorithmException {
-		super(context, "",
+		super(
 				is_register ?
 						NetworkRequestType.generateRegisterParams(user, password) :
 						NetworkRequestType.generateLoginParams(user, password),
 				is_register? register_path : login_path,
-				null
+				o
 		);
 	}
 

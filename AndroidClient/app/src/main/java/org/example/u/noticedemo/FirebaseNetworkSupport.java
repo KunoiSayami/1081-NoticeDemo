@@ -19,11 +19,9 @@
  */
 package org.example.u.noticedemo;
 
-import android.content.Context;
-
-class FirebaseNetworkSupport extends NetworkSupportBase {
-	FirebaseNetworkSupport(Context context, String firebase_id) {
-		super(context, null, NetworkRequestType.generateRegisterFirebaseIDParams(
+class FirebaseNetworkSupport extends Connect {
+	FirebaseNetworkSupport(String firebase_id) {
+		super(NetworkRequestType.generateRegisterFirebaseIDParams(
 				firebase_id,
 				MainActivity.userSession.getUserSession()
 		), NetworkPath.firebase_id_register_path, null);

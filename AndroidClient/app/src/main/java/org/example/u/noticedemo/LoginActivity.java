@@ -36,14 +36,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.util.ArrayList;
 
-class NetworkLoginException extends Exception {
-
-}
-
-class NetworkRegisterException extends Exception {
-
-}
-
 public class LoginActivity extends AppCompatActivity{
 
 	EditText etUser, etPassword, etRepeatPassword;
@@ -53,8 +45,6 @@ public class LoginActivity extends AppCompatActivity{
 
 	ArrayList<TextWatcher> arrayList;
 	String TAG = "log_LoginActivity";
-
-	private CallbackLister lister;
 
 	boolean _register_status = false;
 
@@ -108,13 +98,12 @@ public class LoginActivity extends AppCompatActivity{
 				}
 
 				try {
-					networkSupport = new AccountNetworkSupport(LoginActivity.this, strRegUser, strRegPassword, true);
-					networkSupport.Task(new OnTaskCompleted() {
+					networkSupport = new AccountNetworkSupport(strRegUser, strRegPassword, new OnTaskCompleted() {
 						@Override
 						public void onTaskCompleted(Object httpRawResponse) {
 							callback((HttpRawResponse) httpRawResponse);
 						}
-					});
+					}, true);
 					networkSupport.execute();
 				} catch (Exception e){
 					e.printStackTrace();
@@ -188,13 +177,12 @@ public class LoginActivity extends AppCompatActivity{
 				}
 
 				try {
-					networkSupport = new AccountNetworkSupport(LoginActivity.this, strUser, strPassword, false);
-					networkSupport.Task(new OnTaskCompleted() {
+					networkSupport = new AccountNetworkSupport(strUser, strPassword, new OnTaskCompleted() {
 						@Override
 						public void onTaskCompleted(Object httpRawResponse) {
 							callback((HttpRawResponse) httpRawResponse);
 						}
-					});
+					}, false);
 					networkSupport.execute();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -295,8 +283,6 @@ public class LoginActivity extends AppCompatActivity{
 				register_callback(httpRawResponse);
 			else {
 				login_callback(httpRawResponse);
-				if (lister != null)
-					lister.onCallback(null);
 			}
 		}
 		catch (Exception e){
@@ -331,7 +317,7 @@ public class LoginActivity extends AppCompatActivity{
 			MainActivity.userSession.getFromHttpRawResponse(httpRawResponse);
 			MainActivity.databaseHelper.setSessionString(httpRawResponse.getSessionString());
 			MainActivity.databaseHelper.setLoginedUser(httpRawResponse.getSessionUser());
-			MainActivity.reportFirebaseId(LoginActivity.this, MainActivity.userSession.getFirebaseID());
+			MainActivity.reportFirebaseId(MainActivity.userSession.getFirebaseID());
 			Toast.makeText(this, "Login success", Toast.LENGTH_SHORT).show();
 			if (cbRemember.isChecked()) {
 				MainActivity.databaseHelper.updateUser(this.getUser(), this.getPassword());

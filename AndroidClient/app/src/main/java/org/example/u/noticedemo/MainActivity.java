@@ -40,6 +40,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
+
+import org.example.u.noticedemo.listSupport.NotificationAdapter;
+import org.example.u.noticedemo.listSupport.NotificationType;
+
+import java.util.ArrayList;
+
+import cz.ackee.useragent.UserAgent;
+
 public class MainActivity extends AppCompatActivity {
 
 	static String TAG = "log_Main";
@@ -91,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
 		lvNotices = findViewById(R.id.lvNotices);
 	}
 
-
 	void init(){
 		this.findView();
 		MainActivity.databaseHelper = new DatabaseHelper(this);
@@ -103,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
 		}
 
 		NetworkPath.loadConfig(MainActivity.this);
+		Connect.setUserAgent(UserAgent.getInstance(this).getUserAgentString(""));
 
 		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 		StrictMode.setThreadPolicy(policy);
@@ -120,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
 
 						// Get new Instance ID token
 						String token = task.getResult().getToken();
-						reportFirebaseId(MainActivity.this, token);
+						reportFirebaseId(token);
 						// Log and toast
 						String msg = getString(R.string.msg_token_fmt, token);
 						Log.d(TAG, msg);
@@ -159,8 +167,7 @@ public class MainActivity extends AppCompatActivity {
 				new IntentFilter(getString(R.string.IntentFilter_login_success)));
 
 		if (userSession.getUserSession().length() > 0) {
-			new NetworkSupportBase(MainActivity.this, null,
-					userSession.getRequestParams(),
+			new Connect(userSession.getRequestParams(),
 					NetworkPath.verify_session_path,
 					new OnTaskCompleted() {
 						@Override
@@ -179,12 +186,20 @@ public class MainActivity extends AppCompatActivity {
 							}
 							btnLoginout.setEnabled(true);
 						}
-					}).execute();
+					},
+					true).execute();
 		}
 	}
 
+	void init_listView() {
+		ArrayList<NotificationType> listArray = new ArrayList<>();
+		final NotificationAdapter notificationAdapter = new NotificationAdapter(this, listArray);
+		this.lvNotices.setAdapter(notificationAdapter);
+
+	}
+
 	void setLogoutListener() {
-		NetworkSupportBase l = new NetworkSupportBase(MainActivity.this, null,
+		new Connect(
 				NetworkRequestType.generateLogoutParams(userSession.getUserSession()), NetworkPath.logout_path,
 				new OnTaskCompleted() {
 					@Override
@@ -199,14 +214,13 @@ public class MainActivity extends AppCompatActivity {
 							}
 						});
 					}
-				});
-		l.execute();
+				}).execute();
 	}
 
-	static void reportFirebaseId(Context context, String firebaseID) {
+	static void reportFirebaseId(String firebaseID) {
 		userSession.setFirebaseID(firebaseID);
 		try {
-			FirebaseNetworkSupport firebaseNetworkSupport = new FirebaseNetworkSupport(context, firebaseID);
+			FirebaseNetworkSupport firebaseNetworkSupport = new FirebaseNetworkSupport(firebaseID);
 			firebaseNetworkSupport.execute();
 			Log.d(TAG, "init: Register firebase id successful");
 		} catch (Exception e) {

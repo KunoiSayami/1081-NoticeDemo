@@ -51,6 +51,7 @@
 				Past Notification Panel
 			</label>
 		</div>
+
 		<!-- Firebase messaging panel start -->
 		<div id="firebase_messaging_panel">
 			<form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']);?>" method="post">
@@ -90,8 +91,9 @@
 			</div>
 		</div>
 		<!-- Manage notification panel end-->
-		
+		<div id="console_status"></div>
 	</div>
+
 	<hr>
 	<label><input type="checkbox" id="ck_keep_session" checked="checked">Keep session available</label>
 	<br />

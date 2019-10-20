@@ -7,8 +7,10 @@ var firebase_send_button, radio_set_to_all_client_button, radio_set_to_part_of_u
 var div_notifications, button_notification_submit, button_notification_check,
 	button_notification_uncheck, button_notifaction_delete;
 
-var refresh_button, reset_button;
-var div_firebase_device_id;
+var refresh_button, reset_button, div_firebase_device_id;
+
+var div_console_status;
+
 var last_request_time = 0;
 const expire_time = 120 * 1000, label_offset = 2;
 var i, checkbox_disabled, checkbox_font_style_1;
@@ -29,6 +31,7 @@ function findElementById() {
 	button_notification_submit = document.getElementById('notifications_save');
 	button_notification_check = document.getElementById('notifications_check_all');
 	button_notification_uncheck = document.getElementById('notifications_uncheck_all');
+	div_console_status = document.getElementById('console_status');
 }
 
 function init_panel() {
@@ -57,7 +60,7 @@ function init_panel() {
 			title: txt_firebase_notice_title.value,
 			body: txt_firebase_notice_body.value,
 			select_user: (radio_set_to_all_client_button.checked ? 'all' : select_users)
-		});
+		}).done(() => {show_console_status('Posted!');});
 	});
 
 
@@ -90,7 +93,7 @@ function init_panel() {
 		do_POST('notification_manage', {
 			checked: checked_group,
 			unchecked: unchecked_group
-		});
+		}).done(() => {show_console_status('Saved!');});
 	});
 
 	button_notification_check.addEventListener('click', function (){
@@ -108,8 +111,15 @@ function init_panel() {
 	refresh_firebase_clients(true);
 }
 
+function show_console_status(str , timeout = 5) {
+	div_console_status.innerHTML = '<h3>'+ str +'</h3>';
+	setTimeout(() => {
+		div_console_status.innerHTML = '';
+	}, timeout * 1000);
+}
+
 function do_POST(t, payload, callback = () => {}) {
-	$.post('/request.php', {
+	return $.post('/request.php', {
 		t: t,
 		payload: JSON.stringify(payload)
 	}, callback);

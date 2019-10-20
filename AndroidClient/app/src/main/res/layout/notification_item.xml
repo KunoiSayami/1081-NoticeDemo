@@ -13,6 +13,13 @@
         android:id="@+id/txtNotificationBody"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textAlignment="viewStart"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/txtNotificationTimestamp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:textAlignment="textEnd"
-        android:textSize="13sp" />
+        android:textSize="12sp" />
 </LinearLayout>

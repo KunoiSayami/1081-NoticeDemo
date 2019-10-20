@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
 	static DatabaseHelper databaseHelper;
 	private View.OnClickListener changeToLoginActivityListener, changeToLogoutListener;
 
-	ListView lvNotices;
+	ListView lvNotifications;
 
 	static SessionManage userSession;
 
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 	void findView() {
 		txtUserTitle = findViewById(R.id.txtUserTitle);
 		btnLoginout = findViewById(R.id.btnLoginout);
-		lvNotices = findViewById(R.id.lvNotices);
+		lvNotifications = findViewById(R.id.lvNotifications);
 	}
 
 	void init(){
@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
 			}
 		});
 		btnLoginout.setEnabled(false);
-		lvNotices.setVisibility(View.INVISIBLE);
+		lvNotifications.setVisibility(View.INVISIBLE);
 
 		// https://stackoverflow.com/a/19026743
 		accountEventReceiver = new BroadcastReceiver() {
@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
 				txtUserTitle.setText(String.format(getString(R.string.welcome_title_formatter), databaseHelper.getLoginedUser()));
 				btnLoginout.setText(R.string.logout_text);
 				btnLoginout.setOnClickListener(changeToLogoutListener);
-				lvNotices.setVisibility(View.VISIBLE);
+				lvNotifications.setVisibility(View.VISIBLE);
 			}
 		};
 		LocalBroadcastManager.getInstance(this).registerReceiver(accountEventReceiver,
@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
 								txtUserTitle.setText(String.format(getString(R.string.welcome_title_formatter), userSession.getUserName()));
 								btnLoginout.setText(R.string.logout_text);
 								btnLoginout.setOnClickListener(changeToLogoutListener);
-								lvNotices.setVisibility(View.VISIBLE);
+								lvNotifications.setVisibility(View.VISIBLE);
 							}
 							else {
 								txtUserTitle.setText(R.string.no_user_login_title);
@@ -196,10 +196,10 @@ public class MainActivity extends AppCompatActivity {
 					},true).execute();
 		}
 
-		this.lvNotices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+		this.lvNotifications.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				visableDialog((NotificationType) lvNotices.getItemAtPosition(position));
+				visableDialog((NotificationType) lvNotifications.getItemAtPosition(position));
 			}
 		});
 	}
@@ -225,11 +225,10 @@ public class MainActivity extends AppCompatActivity {
 	void init_listView(ArrayList<NotificationType> notificationList) {
 		ArrayList<NotificationType> listArray = new ArrayList<>();
 		final NotificationAdapter notificationAdapter = new NotificationAdapter(this, listArray);
-		this.lvNotices.setAdapter(notificationAdapter);
+		this.lvNotifications.setAdapter(notificationAdapter);
 		for (NotificationType nt: notificationList){
 			notificationAdapter.add(nt);
 		}
-
 	}
 
 

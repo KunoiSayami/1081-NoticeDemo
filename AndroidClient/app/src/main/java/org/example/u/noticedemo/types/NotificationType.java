@@ -25,13 +25,15 @@ import org.json.JSONObject;
 public class NotificationType {
 	private String title;
 	private String body;
+	private String timestamp;
 	public NotificationType(String _title, String _body){
 		this.title = _title;
 		this.body = _body;
 	}
 	public NotificationType(JSONObject j) throws JSONException {
-		this.title = j.get("title").toString();
-		this.body = j.get("body").toString();
+		this.title = j.getString("title");
+		this.body = j.getString("body");
+		this.timestamp = j.getString("timestamp");
 	}
 
 	public String getTitle() {
@@ -39,10 +41,14 @@ public class NotificationType {
 	}
 
 	public String getBodyShort() {
-		if (getBody().length() > 50) {
-			return getBody().substring(0, 50);
+		if (getBody().length() > 40) {
+			return getBody().substring(0, 40) + "...";
 		}
 		return getBody();
+	}
+
+	public String getTimestamp() {
+		return this.timestamp;
 	}
 
 	public String getBody() {

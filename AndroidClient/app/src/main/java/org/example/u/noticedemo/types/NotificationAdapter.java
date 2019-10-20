@@ -44,10 +44,12 @@ public class NotificationAdapter extends ArrayAdapter<NotificationType> {
 		}
 
 		TextView txtTitle = covertView.findViewById(R.id.txtNotificationTitle),
-				txtBody = covertView.findViewById(R.id.txtNotificationBody);
+				txtBody = covertView.findViewById(R.id.txtNotificationBody),
+				txtTimestamp = covertView.findViewById(R.id.txtNotificationTimestamp);
 
 		txtTitle.setText(nt.getTitle());
 		txtBody.setText(nt.getBodyShort());
+		txtTimestamp.setText(nt.getTimestamp());
 
 		return covertView;
 	}

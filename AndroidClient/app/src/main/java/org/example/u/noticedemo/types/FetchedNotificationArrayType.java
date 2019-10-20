@@ -19,15 +19,13 @@
  */
 package org.example.u.noticedemo.types;
 
-import android.util.Log;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.ArrayList;
 
 public class FetchedNotificationArrayType {
-	ArrayList<NotificationType> notifications = new ArrayList<>();
+	private ArrayList<NotificationType> notifications = new ArrayList<>();
 	public FetchedNotificationArrayType(JSONArray j) {
 		for (int i = 0; i < j.length(); i++){
 			try {

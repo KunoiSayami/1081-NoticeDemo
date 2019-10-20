@@ -24,16 +24,15 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="56dp"
         android:text="@string/text_login"
-        android:textAllCaps="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtUserTitle" />
 
     <ListView
-        android:id="@+id/lvNotices"
-        android:layout_width="388dp"
-        android:layout_height="591dp"
+        android:id="@+id/lvNotifications"
+        android:layout_width="0dp"
+        android:layout_height="357dp"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

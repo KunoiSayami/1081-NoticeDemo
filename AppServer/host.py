@@ -62,10 +62,10 @@ class Server(_exServer):
 					user_id = 0
 				else:
 					user_id = sqlObj['user_id']
-			sqlObj = Server.conn.query("SELECT `title`, `body` FROM `notifications` WHERE "
+			sqlObj = Server.conn.query("SELECT `title`, `body`, `timestamp` FROM `notifications` WHERE "
 				"(`affected_user` LIKE '%%{}%%' OR `affected_user` = 'all') AND `timestamp` > DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 15 DAY) ".format(user_id) +
-				"ORDER BY `timestamp` DESC LIMIT 15")
-			return HTTP_STATUS_CODES.SUCCESS_FETCH_NOTIFICATIONS([{'title': x['title'], 'body': x['body']} for x in sqlObj])
+				"AND `available` = 'Y' ORDER BY `id` DESC LIMIT 15")
+			return HTTP_STATUS_CODES.SUCCESS_FETCH_NOTIFICATIONS([{'title': x['title'], 'body': x['body'], 'timestamp': str(x['timestamp'])} for x in sqlObj])
 
 		return HTTP_STATUS_CODES.ERROR_400_BAD_REQUEST
 
@@ -161,6 +161,10 @@ class Server(_exServer):
 			u = ','.join(d['select_user']) if d['select_user'] != 'all' else 'all'
 			Server.conn.execute("INSERT INTO `notifications` (`title`, `body`, `affected_user`) VALUE (%s, %s, %s)",
 				(d['title'], d['body'], u))
+			return HTTP_STATUS_CODES.SUCCESS_200OK
+		elif d['t'] == 'notification_manage':
+			Server.conn.execute("UPDATE `notifications` SET `available` = 'N' WHERE `id` IN ({})".format(', '.join(d['unchecked'])))
+			Server.conn.execute("UPDATE `notifications` SET `available` = 'Y' WHERE `id` IN ({})".format(', '.join(d['checked'])))
 			return HTTP_STATUS_CODES.SUCCESS_200OK
 		return HTTP_STATUS_CODES.ERROR_400_BAD_REQUEST
 

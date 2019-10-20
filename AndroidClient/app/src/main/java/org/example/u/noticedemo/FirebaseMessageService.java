@@ -29,7 +29,7 @@ import com.google.firebase.messaging.RemoteMessage;
 
 public class FirebaseMessageService extends FirebaseMessagingService {
 
-	String TAG = "log_MyFirebaseMessagingService";
+	String TAG = "log_FirebaseMessagingService";
 
 	@Override
 	public void onMessageReceived(RemoteMessage remoteMessage) {

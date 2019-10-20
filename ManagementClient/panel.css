@@ -1,6 +1,6 @@
 .scrollable_area{
 	height: 150px;
-	width: 15%;
+	width: 35%;
 	overflow: hidden;
 	overflow-y: scroll;
 }

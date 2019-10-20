@@ -24,9 +24,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 class HttpRawResponse {
-	final int user_name_offset = 0;
-	final int user_session_offset = 1;
-
 	private int status;
 	private JSONArray options;
 	private JSONObject errors;
@@ -68,7 +65,7 @@ class HttpRawResponse {
 
 	String getSessionUser() {
 		try {
-			return getOptions().getString(user_name_offset);
+			return getOptions().getString(0);
 		}
 		catch (JSONException e){
 			e.printStackTrace();
@@ -78,7 +75,7 @@ class HttpRawResponse {
 
 	String getSessionString() {
 		try {
-			return getOptions().getString(user_session_offset);
+			return getOptions().getString(1);
 		}
 		catch (JSONException e){
 			e.printStackTrace();

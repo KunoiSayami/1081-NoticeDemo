@@ -19,10 +19,12 @@
 */
 package org.example.u.noticedemo;
 
+import android.content.Intent;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -80,5 +82,7 @@ public class FirebaseMessageService extends FirebaseMessagingService {
 
 		NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
 		notificationManagerCompat.notify(1, builder.build());
+		LocalBroadcastManager.getInstance(this).sendBroadcast(
+				new Intent(getString(R.string.IntentFilter_receive_notification)));
 	}
 }

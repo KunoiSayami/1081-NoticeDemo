@@ -147,7 +147,7 @@ class Server(_exServer):
 			else: # part of user
 				devices = []
 				for user in d['select_user']:
-					sqlObj = Server.conn.quey("SELECT `token` FROM `firebasetoken` WHERE `user_id` = %s AND `register_date` > DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 2 MONTH)", user)
+					sqlObj = Server.conn.query("SELECT `token` FROM `firebasetoken` WHERE `user_id` = %s AND `register_date` > DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 2 MONTH)", user)
 					devices.extend(x['token'] for x in sqlObj)
 				if len(devices) == 1:
 					r = Server.fcmbackend.push_services(devices[0], d['title'], d['body'])

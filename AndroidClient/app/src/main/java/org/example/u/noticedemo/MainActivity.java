@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
 	static SessionManage userSession;
 
-	BroadcastReceiver accountEventReceiver;
+	BroadcastReceiver accountEventReceiver, newNotificationEventReceiver;
 	TextView txtUserTitle;
 	Button btnLoginout;
 
@@ -144,9 +144,6 @@ public class MainActivity extends AppCompatActivity {
 					}
 				});
 
-		/*if (userSession.getUserSession().length() > 0)
-			Toast.makeText(MainActivity.this, R.string.text_checking_login_status, Toast.LENGTH_SHORT).show();*/
-
 		btnLoginout.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -166,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
 				return true;
 			}
 		});
-		btnLoginout.setEnabled(false);
+		//btnLoginout.setEnabled(false);
 		lvNotifications.setVisibility(View.INVISIBLE);
 
 		// https://stackoverflow.com/a/19026743
@@ -204,6 +201,16 @@ public class MainActivity extends AppCompatActivity {
 						}
 					},true).execute();
 		}
+
+		newNotificationEventReceiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				refresh_notifications();
+				Toast.makeText(MainActivity.this, R.string.text_refreshing_notifications, Toast.LENGTH_SHORT).show();
+			}
+		};
+		LocalBroadcastManager.getInstance(this).registerReceiver(newNotificationEventReceiver,
+				new IntentFilter(getString(R.string.IntentFilter_receive_notification)));
 
 		this.lvNotifications.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
@@ -294,6 +301,7 @@ public class MainActivity extends AppCompatActivity {
 	protected void onDestroy() {
 		MainActivity.databaseHelper.close();
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(accountEventReceiver);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(newNotificationEventReceiver);
 		super.onDestroy();
 	}
 }

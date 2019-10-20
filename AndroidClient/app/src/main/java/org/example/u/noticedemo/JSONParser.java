@@ -75,7 +75,7 @@ public class JSONParser {
 		//Structure:
 		// RAW | STATUS | OPTIONS | ERRORS
 		HttpRawResponse httpRawResponse;
-		Log.d(TAG, "networkJsonDecode: json_text => "+ json_text);
+		//Log.d(TAG, "networkJsonDecode: json_text => "+ json_text);
 		try{
 			JSONObject obj = new JSONObject(json_text);
 			httpRawResponse = new HttpRawResponse(obj);

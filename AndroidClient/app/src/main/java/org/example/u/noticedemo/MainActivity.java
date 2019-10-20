@@ -33,6 +33,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -157,6 +158,14 @@ public class MainActivity extends AppCompatActivity {
 				}
 			}
 		});
+		btnLoginout.setOnLongClickListener(new View.OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View v) {
+				refresh_notifications();
+				Toast.makeText(MainActivity.this, R.string.text_refreshing_notifications, Toast.LENGTH_SHORT).show();
+				return true;
+			}
+		});
 		btnLoginout.setEnabled(false);
 		lvNotifications.setVisibility(View.INVISIBLE);
 
@@ -204,8 +213,7 @@ public class MainActivity extends AppCompatActivity {
 		});
 	}
 
-	@Override
-	protected void onResume() {
+	void refresh_notifications() {
 		new Connect(NetworkRequestType.generateFetchNotificationParams(userSession.toString()),
 				NetworkPath.fetch_notification_path,
 				new OnTaskCompleted() {
@@ -219,6 +227,11 @@ public class MainActivity extends AppCompatActivity {
 						}
 					}
 				}, false).execute();
+	}
+
+	@Override
+	protected void onResume() {
+		refresh_notifications();
 		super.onResume();
 	}
 

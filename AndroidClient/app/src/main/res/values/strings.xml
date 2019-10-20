@@ -18,5 +18,6 @@
 
     <string name="text_checking_login_status">Checking login status</string>
     <string name="text_wait">Please wait.</string>
+    <string name="text_refreshing_notifications">Refreshing notifications</string>
 
 </resources>

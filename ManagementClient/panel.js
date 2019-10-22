@@ -16,7 +16,6 @@ var last_request_time = 0;
 const expire_time = 120 * 1000, label_offset = 2;
 var i, checkbox_disabled, checkbox_font_style_1;
 var last_request_type;
-var item_store = [], store_inited = false;
 
 function findElementById() {
 	firebase_send_button = document.getElementById('firebase_send');
@@ -70,7 +69,16 @@ function init_panel() {
 	});
 
 	txt_search_user_field.addEventListener('input', function(){
-		update_search_result(this.value);
+		document.getElementsByName('device_label_groups').forEach(element => {
+			if (element.innerText.indexOf(this.value) == -1){
+				element.children[0].checked = false;
+				element.style.display = "none";
+			}
+			else {
+				element.children[0].checked = true;
+				element.style.display = "";
+			}
+		});
 	});
 
 
@@ -86,7 +94,7 @@ function init_panel() {
 		document.getElementById('past_notification_panel').style.display = "block";
 		refresh_past_notifications();
 	});
-	radio_select_firebase_message.addEventListener('click', function() {
+	radio_select_firebase_message.addEventListener('click', function(){
 		document.getElementById('firebase_messaging_panel').style.display = "block";
 		document.getElementById('past_notification_panel').style.display = "none";
 		refresh_firebase_clients();
@@ -159,7 +167,7 @@ function process_firebase_token_data(raw_json) {
 		div_firebase_device_id.innerHTML +=
 			'<label name="device_label_groups"><input type="checkbox" name="device_id_group" value="' + key +
 			'" id="deviceIdGroup'+ i + '" checked="checked" '+ checkbox_disabled +'><font ' +
-			checkbox_font_style_1 + '>' + raw_json.data[key] +'</font></label><br>';
+			checkbox_font_style_1 + '>' + raw_json.data[key] +'</font><br /></label>';
 		i++;
 	});
 	//div_firebase_device_id.innerHTML += '';
@@ -178,7 +186,6 @@ function get_last_request_type() {
 function refresh_firebase_clients(force = false) {
 	if ((!force && (new Date().getTime() - last_request_time) <= expire_time) || last_request_type == get_last_request_type())
 		return;
-	store_inited = false;
 	$.getJSON('/request.php?t=firebase_clients' + "&" + new Date().getTime(), process_firebase_token_data)
 		.fail(function(){
 			console.error('Error occurd while fetch firebase clients');
@@ -212,21 +219,4 @@ function refresh_past_notifications() {
 		.fail(function() {
 			console.error('Error occurd while fetch past notifications');
 		});
-}
-
-function update_search_result(str) {
-	if (!store_inited){
-		item_store = [];
-		document.getElementsByName('device_label_groups').forEach(element => {
-			item_store.push(element);			
-		});
-		store_inited = true;
-	}
-	div_firebase_device_id.innerHTML = '';
-	item_store.forEach(element => {
-		if (element.innerText.indexOf(str) != -1){
-			div_firebase_device_id.appendChild(element);
-			div_firebase_device_id.innerHTML += '<br />';
-		}
-	});
 }

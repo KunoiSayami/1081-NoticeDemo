@@ -49,6 +49,7 @@ class Server(BaseHTTPRequestHandler):
 
 	# GET sends back a Hello world message
 	def do_GET(self):
+		self.update_real_ip()
 		status, options, errors = self._do_GET()
 		self._set_headers()
 		self.wfile.write(build_status_json(status, options, errors))
@@ -56,8 +57,14 @@ class Server(BaseHTTPRequestHandler):
 	def _do_POST(self, _jsonObject: dict):
 		return self._do_GET()
 
+	def update_real_ip(self):
+		X_REAL_IP = self.headers.get('X-Real-IP')
+		if X_REAL_IP:
+			self.client_address = (X_REAL_IP, self.client_address[1])
+
 	# POST echoes the message adding a JSON field
 	def do_POST(self):
+		self.update_real_ip()
 		ctype, pdict = cgi.parse_header(self.headers.get_content_type())
 
 		# refuse to receive non-json content

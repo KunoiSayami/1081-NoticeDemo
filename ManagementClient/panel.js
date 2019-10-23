@@ -59,7 +59,8 @@ function init_panel() {
 		var select_users = [];
 		if (!radio_set_to_all_client_button.checked)
 			document.getElementsByName('device_id_group').forEach(element => {
-				select_users.push(element.value);
+				if (element.checked)
+					select_users.push(element.value);
 			});
 		do_POST('firebase_post', {
 			title: txt_firebase_notice_title.value,

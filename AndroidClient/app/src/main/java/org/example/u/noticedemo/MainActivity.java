@@ -45,6 +45,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
 
+import org.example.u.noticedemo.lib.PopupDialog;
 import org.example.u.noticedemo.types.NetworkRequestType;
 import org.example.u.noticedemo.types.NotificationAdapter;
 import org.example.u.noticedemo.types.FetchedNotificationArrayType;
@@ -131,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
 					public void onComplete(@NonNull Task<InstanceIdResult> task) {
 						if (!task.isSuccessful()) {
 							Log.w(TAG, "getInstanceId failed", task.getException());
+							PopupDialog.build(MainActivity.this, task.getException());
 							return;
 						}
 
@@ -215,7 +217,8 @@ public class MainActivity extends AppCompatActivity {
 		this.lvNotifications.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				visableDialog((NotificationType) lvNotifications.getItemAtPosition(position));
+				NotificationType nt = (NotificationType)lvNotifications.getItemAtPosition(position);
+				PopupDialog.build(MainActivity.this, nt.getTitle(), nt.getBody());
 			}
 		});
 	}
@@ -249,22 +252,6 @@ public class MainActivity extends AppCompatActivity {
 		for (NotificationType nt: notificationList){
 			notificationAdapter.add(nt);
 		}
-	}
-
-
-	private void visableDialog(final NotificationType nt) {
-		/* copied from https://stackoverflow.com/questions/6264694/how-to-add-message-box-with-ok-button */
-		AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
-		dlgAlert.setTitle(nt.getTitle());
-		dlgAlert.setMessage(nt.getBody());
-		dlgAlert.setPositiveButton("OK",
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						//dismiss the dialog
-					}
-				});
-		dlgAlert.setCancelable(true);
-		dlgAlert.create().show();
 	}
 
 	void setLogoutListener() {
